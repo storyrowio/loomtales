@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F9FAFB;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: oklch(71.179% 0.18111 22.449);
+  --color-primary-50: oklch(97.792% 0.01075 17.34);
+  --color-primary-100: oklch(94.326% 0.02858 15.011);
+  --color-primary-200: oklch(87.925% 0.06408 18.446);
+  --color-primary-300: oklch(81.711% 0.10309 18.791);
+  --color-primary-400: oklch(76.148% 0.14212 20.941);
+  --color-primary-500: oklch(71.179% 0.18111 22.449);
+  --color-primary-600: oklch(64.896% 0.23687 26.775);
+  --color-primary-700: oklch(61.865% 0.25377 29.118);
+  --color-primary-800: oklch(51.123% 0.20971 29.131);
+  --color-primary-900: oklch(39.783% 0.16313 29.016);
+  --color-primary-950: oklch(33.807% 0.13857 28.88);
+
+  --color-secondary: oklch(84.666% 0.15166 80.934);
+  --color-secondary-50: oklch(97.781% 0.02393 85.787);
+  --color-secondary-100: oklch(96.173% 0.0408 85.29);
+  --color-secondary-200: oklch(93.056% 0.0737 84.8);
+  --color-secondary-300: oklch(90.086% 0.10443 84.171);
+  --color-secondary-400: oklch(87.294% 0.1305 82.858);
+  --color-secondary-500: oklch(84.666% 0.15166 80.934);
+  --color-secondary-600: oklch(80.898% 0.16884 74.966);
+  --color-secondary-700: oklch(69.809% 0.1483 73.523);
+  --color-secondary-800: oklch(55.868% 0.11803 74.685);
+  --color-secondary-900: oklch(40.772% 0.08573 75.757);
+  --color-secondary-950: oklch(32.922% 0.06852 78.437);
+
+  --color-border-primary: #E4E7EC;
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
