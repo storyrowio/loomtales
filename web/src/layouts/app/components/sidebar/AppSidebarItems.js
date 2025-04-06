@@ -1,5 +1,5 @@
-import AppSidebarSectionTitle from "layouts/app/components/AppSidebarSectionTitle";
-import AppSidebarItem from "layouts/app/components/AppSidebatItem";
+import AppSidebarSectionTitle from "layouts/app/components/sidebar/AppSidebarSectionTitle";
+import AppSidebarItem from "layouts/app/components/sidebar/AppSidebatItem";
 
 export default function AppSidebarItems(props) {
     const { items, parent } = props;

@@ -1,13 +1,28 @@
-import AppSidebar from "layouts/app/components/AppSidebar";
+import AppSidebar from "layouts/app/components/sidebar/AppSidebar";
+import AppNavbar from "layouts/app/components/navbar/AppNavbar";
+import {useDispatch, useSelector} from "store";
+
+const AppContent = (props) => {
+    const { miniSidebar, miniSidebarWidth, sidebarWidth, children } = props;
+
+    return (
+        <div className={`pt-[70px] ml-[${miniSidebar ? miniSidebarWidth : sidebarWidth}px]`}>
+            {children}
+        </div>
+    )
+};
 
 export default function AppLayout({ children }) {
+    const { ...state } = useSelector(state => state.theme);
+
     return (
-        <div>
-            <div className="flex">
-                <AppSidebar/>
-                <div>
+        <div className="flex relative">
+            <AppSidebar/>
+            <div className="w-full">
+                <AppNavbar/>
+                <AppContent {...state}>
                     {children}
-                </div>
+                </AppContent>
             </div>
         </div>
     )

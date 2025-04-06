@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
+    "framer-motion": "^12.6.3",
     "hugeicons-react": "^0.3.0",
     "next": "15.2.4",
     "react": "^19.0.0",
