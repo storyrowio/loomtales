@@ -8,6 +8,24 @@ export const AppMenus = [
     },
     {
         id: GenerateUniqueId(),
+        title: 'Templates',
+        icon: ArtboardToolIcon,
+        paths: ['/user', '/user/create', '/user/:id/update'],
+        children: [
+            {
+                id: GenerateUniqueId(),
+                title: 'List Users',
+                href: '/user'
+            },
+            {
+                id: GenerateUniqueId(),
+                title: 'Create User',
+                href: '/user/create'
+            }
+        ]
+    },
+    {
+        id: GenerateUniqueId(),
         title: 'Dashboard',
         icon: Home01Icon,
         href: '/dashboard',
@@ -28,12 +46,7 @@ export const AppMenus = [
         icon: Folder02Icon,
         href: '/content-library',
     },
-    {
-        id: GenerateUniqueId(),
-        title: 'Templates',
-        icon: ArtboardToolIcon,
-        href: '/template',
-    },
+
     {
         id: GenerateUniqueId(),
         sectionTitle: 'Social Account'

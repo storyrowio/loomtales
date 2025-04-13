@@ -1,68 +1,111 @@
+'use client'
+
 import {useDispatch, useSelector} from "store";
-import Image from "next/image";
+import {styled, useTheme} from "@mui/material/styles";
+import IconButton from "@mui/material/IconButton";
+import {ArrowLeft01Icon, ArrowRight01Icon, Mail02Icon, Message02Icon} from "hugeicons-react";
+import Divider from "@mui/material/Divider";
+import * as React from "react";
+import {ThemeActions} from "store/slices/ThemeSlice";
+import {Drawer, useMediaQuery} from "@mui/material";
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Logo from "components/shared/Logo";
 import AppSidebarItems from "layouts/app/components/sidebar/AppSidebarItems";
 import {AppMenus} from "constants/menus";
-import {ArrowLeft01Icon} from "hugeicons-react";
-import IconButton from "components/ui/buttons/IconButton";
-import {ThemeActions} from "store/slices/ThemeSlice";
-import { motion } from "framer-motion";
 
-const Header = ({ miniSidebar }) => {
+const openedMixin = (theme, drawerWidth) => ({
+    width: drawerWidth,
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+    }),
+    overflowX: 'hidden',
+});
+
+const closedMixin = (theme, miniDrawerWidth) => ({
+    transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    overflowX: 'hidden',
+    width: miniDrawerWidth,
+});
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 2),
+    position: 'relative',
+    ...theme.mixins.toolbar,
+}));
+
+const CustomDrawer = styled(Drawer)
+(({theme}) => ({
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+
+    '.MuiDrawer-paper': {
+        background: theme.palette.background.paper,
+    }
+}));
+
+export default function AppSidebar() {
+    const theme = useTheme();
     const dispatch = useDispatch();
+    const mobile = useMediaQuery(theme.breakpoints.down('md'));
+    const { drawerWidth, miniDrawerWidth, sidebarOpen } = useSelector(state => state.theme);
 
-    return (
-        <div className={`h-[35px] mt-2 flex items-end relative`}>
-            <Image
-                src={miniSidebar ? '/images/logos/logo-icon                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    .svg' : '/images/logos/logo.svg'}
-                alt="logo"
-                width={140}
-                height={34}/>
-            <IconButton
-                className="!size-[32px] !border-1 rounded-md absolute top-[0.5rem] -right-[40px]"
-                onClick={() => dispatch(ThemeActions.setMiniSidebar(!miniSidebar))}
-            >
-                <ArrowLeft01Icon size={18} strokeWidth={2} className="text-neutral-500"/>
-            </IconButton>
-        </div>
-    )
-};
-
-export default function AppSidebar(props) {
-    const { miniSidebar, miniSidebarWidth, sidebarWidth } = useSelector(state => state.theme);
-
-    const sidebarVariants = {
-        expanded: {
-            width: "240px",
-            transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 30
-            }
-        },
-        collapsed: {
-            width: "80px",
-            transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 30
-            }
-        }
+    const handleToggle = () => {
+        dispatch(ThemeActions.setSidebarOpen(!sidebarOpen));
     };
 
     return (
-        <motion.nav
-            initial="expanded"
-            animate={!miniSidebar ? "expanded" : "collapsed"}
-            variants={sidebarVariants}
-            className={`sticky z-10 top-0 h-screen shrink-0 bg-white border-r border-border-primary ${miniSidebar ? 'px-3' : 'px-6'}`}
-            style={{width: `${miniSidebar ? miniSidebarWidth : sidebarWidth}px`}}>
-            <div
-                // className={`min-h-screen px-6 bg-white border-r border-border-primary`}
-                >
-                <Header miniSidebar={miniSidebar}/>
-                {/*<Divider/>*/}
-                <AppSidebarItems items={AppMenus}/>
-            </div>
-        </motion.nav>
+        <Box sx={{ position: 'relative' }}>
+            {!mobile && (
+                <IconButton
+                    onClick={handleToggle}
+                    sx={{
+                        position: 'absolute',
+                        right: -15,
+                        top: 15,
+                        zIndex: 9999
+                    }} variant="outlined">
+                    {!sidebarOpen ? <ArrowRight01Icon /> : <ArrowLeft01Icon />}
+                </IconButton>
+            )}
+            <CustomDrawer
+                open={sidebarOpen}
+                onClose={handleToggle}
+                variant={mobile ? 'temporary' : 'permanent'}
+                sx={{
+                    ...!mobile && {
+                        ...sidebarOpen && {
+                            ...openedMixin(theme, drawerWidth),
+                            '& .MuiDrawer-paper': openedMixin(theme, drawerWidth),
+                        },
+                        ...!sidebarOpen && {
+                            ...closedMixin(theme, miniDrawerWidth),
+                            '& .MuiDrawer-paper': closedMixin(theme, miniDrawerWidth),
+                        }
+                    }
+                }}
+            >
+                <DrawerHeader>
+                    <Logo
+                        width={!mobile && !sidebarOpen ? 35 : 140}
+                        icon={!mobile && !sidebarOpen}/>
+                </DrawerHeader>
+                <Box sx={{ paddingX: 2 }}>
+                    <Divider />
+                    <AppSidebarItems items={AppMenus}/>
+                </Box>
+            </CustomDrawer>
+        </Box>
     )
 }
