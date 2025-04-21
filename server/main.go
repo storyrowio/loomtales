@@ -5,11 +5,11 @@ import (
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"golang-docker-skeleton/config"
-	"golang-docker-skeleton/controllers"
-	"golang-docker-skeleton/database"
-	"golang-docker-skeleton/models"
 	"log"
+	"loomtales/config"
+	"loomtales/controllers"
+	"loomtales/database"
+	"loomtales/models"
 	"net/http"
 	"os"
 	"time"
@@ -62,6 +62,11 @@ func main() {
 
 		protected := api.Group("/", config.AuthMiddleware())
 		{
+			front := protected.Group("/front")
+			{
+				front.GET("/menus", controllers.GetFrontSidebarMenus)
+			}
+
 			protected.GET("/profile", controllers.GetProfile)
 			protected.PATCH("/profile", controllers.UpdateProfile)
 

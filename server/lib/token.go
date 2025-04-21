@@ -3,8 +3,8 @@ package lib
 import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
-	"golang-docker-skeleton/models"
 	"log"
+	"loomtales/models"
 	"net/http"
 	"os"
 	"strings"

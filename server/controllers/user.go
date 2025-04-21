@@ -5,9 +5,9 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang-docker-skeleton/lib"
-	"golang-docker-skeleton/models"
-	"golang-docker-skeleton/services"
+	"loomtales/lib"
+	"loomtales/models"
+	"loomtales/services"
 	"net/http"
 	"time"
 )

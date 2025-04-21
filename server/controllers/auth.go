@@ -6,9 +6,10 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang-docker-skeleton/lib"
-	"golang-docker-skeleton/models"
-	"golang-docker-skeleton/services"
+	"log"
+	"loomtales/lib"
+	"loomtales/models"
+	"loomtales/services"
 	"net/http"
 	"os"
 	"time"
@@ -69,14 +70,26 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
+	// Send email
+	verificationUrl := os.Getenv("FRONTEND_URL") + "/verify/"
+	templatePath := "templates/verification.html"
+	mailData := models.VerificationMail{
+		Name: user.Name,
+		Link: verificationUrl + *token,
+	}
+	err = lib.SendEmail(request.Email, "Your Verification Link", mailData, templatePath)
+	if err != nil {
+		log.Println("Error sending email:", err)
+	}
+
 	result := models.LoginResult{
 		Id:    user.Id,
 		Name:  user.Name,
 		Email: user.Email,
-		Token: *token,
+		//Token: *token,
 	}
 
-	c.JSON(http.StatusOK, models.Response{Data: result})
+	c.JSON(http.StatusOK, models.Response{Data: result, Message: "Email verification has been sent."})
 	return
 }
 

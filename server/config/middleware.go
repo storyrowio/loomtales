@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"golang-docker-skeleton/models"
+	"loomtales/models"
 	"net/http"
 	"os"
 	"strings"

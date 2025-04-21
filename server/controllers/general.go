@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
-	"golang-docker-skeleton/models"
-	"golang-docker-skeleton/services"
 	"io"
 	"log"
+	"loomtales/models"
+	"loomtales/services"
 	"net/http"
 	"os"
 )

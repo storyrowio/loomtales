@@ -25,9 +25,11 @@ func SendEmail(to string, subject string, data interface{}, templateFile string)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", result)
 
+	m.Embed("templates/assets/logo.svg")
+
 	port, _ := strconv.ParseInt(os.Getenv("MAIL_PORT"), 10, 64)
 
-	d := gomail.NewDialer(os.Getenv("MAIL_HOST"), int(port), os.Getenv("MAIL_USERNAME"), os.Getenv("MAIL_PASSWORD"))
+	d := gomail.NewDialer(os.Getenv("MAIL_HOST"), int(port), os.Getenv("MAIL_USERNAME"), os.Getenv("MAIL_APP_PASSWORD"))
 	err := d.DialAndSend(m)
 	if err != nil {
 		return err
@@ -51,7 +53,7 @@ func ParseTemplate(templateFileName string, data interface{}) (string, error) {
 
 func SendEmailVerification(template string, to string, data interface{}) error {
 	t := "templates/" + template + ".html"
-	subject := "Please Confirm Your Email"
+	subject := "Your Verification Email"
 	err := SendEmail(to, subject, data, t)
 	if err != nil {
 		return err

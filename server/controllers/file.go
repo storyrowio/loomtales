@@ -3,9 +3,9 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"golang-docker-skeleton/lib"
-	"golang-docker-skeleton/models"
-	"golang-docker-skeleton/services"
+	"loomtales/lib"
+	"loomtales/models"
+	"loomtales/services"
 	"mime/multipart"
 	"net/http"
 	"strings"

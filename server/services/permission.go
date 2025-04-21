@@ -5,8 +5,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang-docker-skeleton/database"
-	"golang-docker-skeleton/models"
+	"loomtales/database"
+	"loomtales/models"
 )
 
 const PermissionCollection = "permissions"

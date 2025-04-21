@@ -9,8 +9,8 @@ COPY *.go ./
 RUN rm -f .env .env.* .env-*
 RUN rm -rf .git .gitignore
 
-RUN go build -o /golang-docker-skeleton
+RUN go build -o /loomtales
 
 EXPOSE 8000
 
-CMD [ "/golang-docker-skeleton" ]
+CMD [ "/loomtales" ]

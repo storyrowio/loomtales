@@ -8,10 +8,10 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"golang-docker-skeleton/database"
-	"golang-docker-skeleton/models"
 	"golang.org/x/oauth2"
 	"log"
+	"loomtales/database"
+	"loomtales/models"
 	"mime/multipart"
 	"path/filepath"
 

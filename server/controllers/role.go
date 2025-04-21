@@ -5,8 +5,8 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"golang-docker-skeleton/models"
-	"golang-docker-skeleton/services"
+	"loomtales/models"
+	"loomtales/services"
 	"net/http"
 	"time"
 )

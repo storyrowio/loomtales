@@ -3,7 +3,7 @@
     {
       "id": "86d03ea7-a43a-48d7-b392-71881dd91481",
       "name": "Admin",
-      "email": "admin@storyrow.io",
+      "email": "admin@loomtales.com",
       "password": "admin",
       "active": true,
       "isAdminSystem": true
@@ -35,10 +35,24 @@
     {
       "id": "b0714389-8d36-44a9-9486-3389f6882f8a",
       "code": "profile",
-      "name": "Company Profile",
+      "name": "Loomtales",
       "setting": {
-        "name": "Golang Skeleton",
-        "email": "cs@skeleton.com"
+        "name": "Loomtales",
+        "email": "cs@loomtales.com",
+        "noReplyEmail": "no-reply@loomtales.id"
+      },
+      "type": "general",
+      "status": true,
+      "isDefault": true
+    },
+    {
+      "id": "368cd466-5733-419e-a6a0-61ae2654ec8f",
+      "code": "currency",
+      "name": "Currency",
+      "setting": {
+        "availableCurrencies": ["USD", "IDR"],
+        "currency": "USD",
+        "symbol": "$"
       },
       "type": "general",
       "status": true,

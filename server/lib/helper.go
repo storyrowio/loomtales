@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"loomtales/models"
 	"math/rand"
 	"regexp"
 	"strconv"
@@ -55,4 +56,68 @@ func InvoiceGenerator() string {
 	char := RandomChar(3)
 
 	return strconv.FormatInt(date, 10) + char
+}
+
+func GetAllSidebarMenus() []models.FrontSidebarMenu {
+	menus := []models.FrontSidebarMenu{
+		{
+			Id:    "dashboard",
+			Title: "Dashboard",
+			Icon:  "dashboard",
+			Path:  "/",
+		},
+		{
+			Id:    "user",
+			Title: "User",
+			Icon:  "user",
+			Children: []models.FrontSidebarMenu{
+				{
+					Id:          "user:create",
+					Title:       "Create User",
+					Icon:        "",
+					Path:        "",
+					Permissions: []string{"user:create"},
+				},
+			},
+		},
+	}
+
+	return menus
+}
+
+func MenuHasAnyPermission(menuPermissions []string, userPermissions []string) bool {
+	for _, perm := range menuPermissions {
+		for _, userPermission := range userPermissions {
+			if userPermission == "all" || userPermission == perm {
+				return true
+			}
+		}
+	}
+
+	return len(menuPermissions) == 0
+}
+
+func GenerateSidebarMenus(userPermissions []string, menus []models.FrontSidebarMenu) []models.FrontSidebarMenu {
+	if menus == nil {
+		menus = GetAllSidebarMenus()
+	}
+
+	result := make([]models.FrontSidebarMenu, 0)
+
+	for _, menu := range menus {
+		if len(menu.Permissions) > 0 && !MenuHasAnyPermission(menu.Permissions, userPermissions) {
+			continue
+		}
+
+		if len(menu.Children) > 0 {
+			menu.Children = GenerateSidebarMenus(userPermissions, menu.Children)
+			if len(menu.Children) == 0 {
+				continue
+			}
+		}
+
+		result = append(result, menu)
+	}
+
+	return result
 }
