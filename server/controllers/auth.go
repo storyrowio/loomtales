@@ -33,7 +33,7 @@ func SignUp(c *gin.Context) {
 		}
 	} else {
 		if user != nil {
-			c.JSON(http.StatusBadRequest, models.Response{Data: errors.New("Email already exist")})
+			c.JSON(http.StatusBadRequest, models.Response{Data: errors.New("Email already exist").Error()})
 			return
 		}
 		roleId := ""
@@ -57,11 +57,11 @@ func SignUp(c *gin.Context) {
 			},
 		}
 
-		_, err = services.CreateUser(*user)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
-			return
-		}
+		//_, err = services.CreateUser(*user)
+		//if err != nil {
+		//	c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		//	return
+		//}
 	}
 
 	token, err := lib.GenerateToken(request.Email)

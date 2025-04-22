@@ -20,12 +20,12 @@ func SendEmail(to string, subject string, data interface{}, templateFile string)
 	result, _ := ParseTemplate(templateFile, data)
 
 	m := gomail.NewMessage()
-	m.SetHeader("From", from)
+	m.SetAddressHeader("From", from, "Loomtales")
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", subject)
 	m.SetBody("text/html", result)
 
-	m.Embed("templates/assets/logo.svg")
+	m.Embed("templates/assets/logo.png")
 
 	port, _ := strconv.ParseInt(os.Getenv("MAIL_PORT"), 10, 64)
 
