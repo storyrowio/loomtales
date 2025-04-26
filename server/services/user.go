@@ -98,13 +98,13 @@ func DeleteUser(id string) (*mongo.DeleteResult, error) {
 }
 
 func GetCurrentUser(r *http.Request) *models.User {
-	token, e := CheckHeader(r)
+	token, e := lib.CheckHeader(r)
 
 	if e != nil {
 		return nil
 	}
 
-	email, err := VerifyToken(token)
+	email, err := lib.VerifyToken(token)
 
 	if err != nil {
 		return nil

@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"loomtales/models"
 	"loomtales/services"
 	"net/http"
@@ -21,21 +20,7 @@ func GetRoles(c *gin.Context) {
 	}
 
 	filters := query.GetQueryFind()
-
-	keyword, keywordExist := c.GetQuery("keyword")
-	if keywordExist {
-		regex := primitive.Regex{
-			Pattern: "^" + keyword,
-			Options: "i",
-		}
-		filters["$or"] = bson.A{
-			bson.M{"name": regex},
-			bson.M{"email": regex},
-		}
-	}
-
 	opts := query.GetOptions()
-	opts.SetProjection(bson.M{"password": 0})
 
 	results := services.GetRolesWithPagination(filters, opts, query)
 
@@ -87,8 +72,7 @@ func UpdateRole(c *gin.Context) {
 		return
 	}
 
-	var request models.Role
-
+	var request map[string]interface{}
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})

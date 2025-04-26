@@ -2,68 +2,14 @@ package services
 
 import (
 	"errors"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"loomtales/database"
 	"loomtales/lib"
 	"loomtales/models"
-	"net/http"
-	"os"
-	"strings"
 	"time"
 )
-
-func GenerateToken(email string) (*string, error) {
-	expire := time.Now().Add(24 * time.Hour)
-
-	claims := models.Claims{
-		Email: email,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: expire.Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET_KEY")))
-
-	if err == nil {
-		return &tokenString, nil
-	}
-
-	return nil, errors.New(err.Error())
-}
-
-func CheckHeader(r *http.Request) (string, error) {
-	header := r.Header["Authorization"]
-
-	if header == nil {
-		return "", errors.New("unauthorized")
-	}
-
-	split := strings.Split(header[0], " ")
-	if len(split) != 2 || strings.ToLower(split[0]) != "bearer" {
-		return "", errors.New("unauthorized")
-	}
-
-	return split[1], nil
-}
-
-func VerifyToken(tokenString string) (string, error) {
-	claims := &models.Claims{}
-
-	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET_KEY")), nil
-	})
-
-	if err != nil {
-		log.Println(err)
-		return "", errors.New("Token invalid")
-	}
-
-	return claims.Email, nil
-}
 
 func AuthWithSocial(user *models.User, request models.AuthRequest) error {
 	isExist := false
@@ -133,7 +79,7 @@ func AuthWithSocial(user *models.User, request models.AuthRequest) error {
 }
 
 func Activate(token string) (bool, error) {
-	email, err := VerifyToken(token)
+	email, err := lib.VerifyToken(token)
 
 	if err != nil {
 		return false, err
@@ -165,7 +111,7 @@ func ForgotPassword(email string, url string) (bool, error) {
 		return false, errors.New("user not found")
 	}
 
-	token, err := GenerateToken(email)
+	token, err := lib.GenerateToken(email)
 
 	if err != nil {
 		return false, err
@@ -178,16 +124,23 @@ func ForgotPassword(email string, url string) (bool, error) {
 		Link: url + tokenValue,
 	}
 
-	err = lib.SendEmailVerification("forgot-password", user.Email, data)
+	mailRequest := models.SendMailRequest{
+		To:           user.Email,
+		Subject:      "Your Verification Link",
+		Data:         data,
+		TemplatePath: "templates/forgot-password.html",
+	}
+
+	err = lib.SendEmail(mailRequest)
 	if err != nil {
-		return false, err
+		log.Println("Error sending email:", err)
 	}
 
 	return true, nil
 }
 
 func UpdatePassword(token string, password string) (bool, error) {
-	email, err := VerifyToken(token)
+	email, err := lib.VerifyToken(token)
 
 	if err != nil {
 		return false, err

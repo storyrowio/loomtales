@@ -1,6 +1,6 @@
-import Api from "utils/api.jsx";
-import AppStorage from "utils/storage.jsx";
-import {AUTH_TOKEN} from "constants/storage.jsx";
+import Api from "@/lib/api.jsx";
+import AppStorage from "@/lib/storage.jsx";
+import {AUTH_TOKEN} from "@/constants/storage.jsx";
 
 const Login = (params) => {
     return Api.Instance.post('/login', params)

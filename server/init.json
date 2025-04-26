@@ -97,5 +97,47 @@
       "status": true,
       "isDefault": true
     }
+  ],
+  "frontSidebarMenus": [
+    {
+      "id": "dashboard",
+      "title": "Dashboard",
+      "icon": "dashboard",
+      "path": "/"
+    },
+    {
+      "id": "content",
+      "title": "Content",
+      "sectionTitle": true
+    },
+    {
+      "id": "calendar",
+      "title": "Calendar",
+      "icon": "calendar",
+      "path": "/calendar"
+    },
+    {
+      "id": "content-library",
+      "title": "Content Library",
+      "icon": "contentLibrary",
+      "path": "/content-library"
+    },
+    {
+      "id": "templates",
+      "title": "Templates",
+      "icon": "templates",
+      "path": "/templates"
+    },
+    {
+      "id": "content",
+      "title": "Content",
+      "sectionTitle": true
+    },
+    {
+      "id": "social-accounts",
+      "title": "Social Accounts",
+      "icon": "socialAccounts",
+      "path": "/social-accounts"
+    }
   ]
 }

@@ -5,31 +5,32 @@ import (
 	"gopkg.in/gomail.v2"
 	"html/template"
 	"log"
+	"loomtales/models"
 	"os"
 	"strconv"
 )
 
-func SendEmail(to string, subject string, data interface{}, templateFile string) error {
-
+func SendEmail(params models.SendMailRequest) error {
 	from := "no-reply@storyrow.id"
-
 	if os.Getenv("APP_DOMAIN") != "" {
 		from = "no-reply@" + os.Getenv("APP_DOMAIN")
 	}
 
-	result, _ := ParseTemplate(templateFile, data)
+	result, _ := ParseTemplate(params.TemplatePath, params.Data)
 
 	m := gomail.NewMessage()
-	m.SetAddressHeader("From", from, "Loomtales")
-	m.SetHeader("To", to)
-	m.SetHeader("Subject", subject)
+	m.SetHeader("From", from)
+	m.SetHeader("To", params.To)
+	m.SetHeader("Subject", params.Subject)
 	m.SetBody("text/html", result)
 
-	m.Embed("templates/assets/logo.png")
+	m.Embed("templates/assets/logo.svg", gomail.SetHeader(map[string][]string{
+		"Content-ID": {"<logo>"},
+	}))
 
-	port, _ := strconv.ParseInt(os.Getenv("MAIL_PORT"), 10, 64)
+	port, _ := strconv.ParseInt(params.MailSetting.MailPort, 10, 64)
 
-	d := gomail.NewDialer(os.Getenv("MAIL_HOST"), int(port), os.Getenv("MAIL_USERNAME"), os.Getenv("MAIL_APP_PASSWORD"))
+	d := gomail.NewDialer(params.MailSetting.MailHost, int(port), params.MailSetting.MailUsername, params.MailSetting.MailAppPassword)
 	err := d.DialAndSend(m)
 	if err != nil {
 		return err
@@ -49,15 +50,4 @@ func ParseTemplate(templateFileName string, data interface{}) (string, error) {
 		return "", err
 	}
 	return buf.String(), nil
-}
-
-func SendEmailVerification(template string, to string, data interface{}) error {
-	t := "templates/" + template + ".html"
-	subject := "Your Verification Email"
-	err := SendEmail(to, subject, data, t)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

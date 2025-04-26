@@ -1,12 +1,7 @@
-import Api from "utils/api.jsx";
-
-const GetSidebarMenus = () => {
-    return Api.Instance.get('/front/menus')
-        .then(res => res.data?.data);
-};
+import Api from "@/lib/api.jsx";
 
 const GeneralService = {
-    GetSidebarMenus
+
 };
 
 export default GeneralService;

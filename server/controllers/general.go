@@ -58,5 +58,13 @@ func CreateDefaultData(c *gin.Context) {
 		}
 	}
 
+	frontSidebarMenus := services.GetFrontSidebarMenu(bson.M{}, nil)
+	if frontSidebarMenus == nil {
+		_, err2 := services.CreateManyFrontSidebarMenu(data.FrontSidebarMenus)
+		if err2 == nil {
+			log.Println("Default Front Sidebar Menu Has Been Created")
+		}
+	}
+
 	c.JSON(http.StatusOK, models.Response{Data: "Success"})
 }

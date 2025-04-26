@@ -13,12 +13,12 @@ import (
 
 const RoleCollection = "roles"
 
-func GetRoles(filters bson.M, opt *options.FindOptions) []models.Setting {
-	results := make([]models.Setting, 0)
+func GetRoles(filters bson.M, opt *options.FindOptions) []models.Role {
+	results := make([]models.Role, 0)
 
 	cursor := database.Find(RoleCollection, filters, opt)
 	for cursor.Next(context.Background()) {
-		var data models.Setting
+		var data models.Role
 		if cursor.Decode(&data) == nil {
 			results = append(results, data)
 		}
@@ -64,10 +64,10 @@ func GetRole(filter bson.M, opts *options.FindOneOptions) *models.Role {
 	return &data
 }
 
-func UpdateRole(id string, Role interface{}) (*mongo.UpdateResult, error) {
+func UpdateRole(id string, params interface{}) (*mongo.UpdateResult, error) {
 	filters := bson.M{"id": id}
 
-	res, err := database.UpdateOne(RoleCollection, filters, Role)
+	res, err := database.UpdateOne(RoleCollection, filters, params)
 
 	if res == nil {
 		return nil, err

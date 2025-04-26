@@ -3,7 +3,7 @@ import {
     useDispatch as useAppDispatch,
     useSelector as useAppSelector,
 } from 'react-redux';
-import ThemeSlice from "store/slices/ThemeSlice";
+import ThemeSlice from "@/store/slices/ThemeSlice";
 
 const store = configureStore({
     reducer: {

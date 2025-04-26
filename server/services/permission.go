@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,6 +11,20 @@ import (
 )
 
 const PermissionCollection = "permissions"
+
+func GetPermissions(filters bson.M, opt *options.FindOptions) []models.Permission {
+	results := make([]models.Permission, 0)
+
+	cursor := database.Find(PermissionCollection, filters, opt)
+	for cursor.Next(context.Background()) {
+		var data models.Permission
+		if cursor.Decode(&data) == nil {
+			results = append(results, data)
+		}
+	}
+
+	return results
+}
 
 func CreateManyPermissions(params []models.Permission) (bool, error) {
 	data := make([]interface{}, 0)

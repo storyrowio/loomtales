@@ -39,8 +39,9 @@ type AuthResult struct {
 }
 
 type DefaultData struct {
-	Users       []User       `json:"users"`
-	Permissions []Permission `json:"permissions"`
-	Roles       []Role       `json:"roles"`
-	Settings    []Setting    `json:"settings"`
+	Users             []User             `json:"users"`
+	Permissions       []Permission       `json:"permissions"`
+	Roles             []Role             `json:"roles"`
+	Settings          []Setting          `json:"settings"`
+	FrontSidebarMenus []FrontSidebarMenu `json:"frontSidebarMenus"`
 }

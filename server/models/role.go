@@ -9,10 +9,10 @@ const (
 
 type Role struct {
 	Id          string   `json:"id"`
-	Name        string   `json:"name"`
+	Name        string   `json:"name" required:"true"`
 	Code        string   `json:"code"`
 	Permissions []string `json:"permissions"` // permission ids
-	RoleType    string   `json:"roleType"`
+	RoleType    string   `json:"roleType" bson:"roleType"`
 	BasicDate   `bson:",inline"`
 }
 

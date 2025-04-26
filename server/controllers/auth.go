@@ -33,9 +33,10 @@ func SignUp(c *gin.Context) {
 		}
 	} else {
 		if user != nil {
-			c.JSON(http.StatusBadRequest, models.Response{Data: errors.New("Email already exist").Error()})
+			c.JSON(http.StatusBadRequest, models.Response{Data: errors.New("Email already exist")})
 			return
 		}
+
 		roleId := ""
 		role := services.GetRole(bson.M{"code": models.AdminRole}, nil)
 		if role != nil {
@@ -57,11 +58,11 @@ func SignUp(c *gin.Context) {
 			},
 		}
 
-		//_, err = services.CreateUser(*user)
-		//if err != nil {
-		//	c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
-		//	return
-		//}
+		_, err = services.CreateUser(*user)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+			return
+		}
 	}
 
 	token, err := lib.GenerateToken(request.Email)
@@ -72,12 +73,18 @@ func SignUp(c *gin.Context) {
 
 	// Send email
 	verificationUrl := os.Getenv("FRONTEND_URL") + "/verify/"
-	templatePath := "templates/verification.html"
 	mailData := models.VerificationMail{
-		Name: user.Name,
+		Name: request.Name,
 		Link: verificationUrl + *token,
 	}
-	err = lib.SendEmail(request.Email, "Your Verification Link", mailData, templatePath)
+	mailRequest := models.SendMailRequest{
+		To:           request.Email,
+		Subject:      "Your Verification Link",
+		Data:         mailData,
+		TemplatePath: "templates/verification.html",
+	}
+
+	err = lib.SendEmail(mailRequest)
 	if err != nil {
 		log.Println("Error sending email:", err)
 	}
@@ -89,7 +96,7 @@ func SignUp(c *gin.Context) {
 		//Token: *token,
 	}
 
-	c.JSON(http.StatusOK, models.Response{Data: result, Message: "Email verification has been sent."})
+	c.JSON(http.StatusOK, models.Response{Data: result})
 	return
 }
 
@@ -167,15 +174,15 @@ func SignIn(c *gin.Context) {
 }
 
 func RefreshToken(c *gin.Context) {
-	token, err := services.CheckHeader(c.Request)
+	token, err := lib.CheckHeader(c.Request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return
 	}
 
-	email, err := services.VerifyToken(token)
+	email, err := lib.VerifyToken(token)
 	if err != nil {
-		newToken, errGenerate := services.GenerateToken(email)
+		newToken, errGenerate := lib.GenerateToken(email)
 		if errGenerate != nil {
 			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 			return

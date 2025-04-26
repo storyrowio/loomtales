@@ -64,17 +64,13 @@ func main() {
 		{
 			front := protected.Group("/front")
 			{
-				front.GET("/menus", controllers.GetFrontSidebarMenus)
+				front.GET("/sidebar-menus", controllers.GetUserFrontSidebarMenus)
 			}
 
 			protected.GET("/profile", controllers.GetProfile)
 			protected.PATCH("/profile", controllers.UpdateProfile)
 
-			protected.GET("/role", controllers.GetRoles)
-			protected.POST("/role", controllers.CreateRole)
 			protected.GET("/role/:id", controllers.GetRoleById)
-			protected.PATCH("/role/:id", controllers.UpdateRole)
-			protected.DELETE("/role/:id", controllers.DeleteRole)
 			protected.POST("/role/attach-permission", controllers.AttachPermissionsToRole)
 
 			protected.GET("/user", controllers.GetUsers)
@@ -83,6 +79,22 @@ func main() {
 			protected.PATCH("/user/:id", controllers.UpdateUser)
 			protected.DELETE("/user/:id", controllers.DeleteUser)
 
+			admin := protected.Group("/admin", config.AdminMiddleware())
+			{
+				adminFront := admin.Group("/front")
+				{
+					adminFront.GET("/sidebar-menus", controllers.GetFrontSidebarMenus)
+					adminFront.POST("/sidebar-menus", controllers.CreateFrontSidebarMenus)
+				}
+
+				admin.GET("/permission", controllers.GetPermissions)
+				admin.POST("/permission", controllers.CreatePermissions)
+
+				admin.GET("/role", controllers.GetRoles)
+				admin.POST("/role", controllers.CreateRole)
+				admin.PATCH("/role/:id", controllers.UpdateRole)
+				admin.DELETE("/role/:id", controllers.DeleteRole)
+			}
 		}
 	}
 
