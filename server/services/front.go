@@ -107,7 +107,13 @@ func CreateManyFrontSidebarMenu(params []models.FrontSidebarMenu) (bool, error) 
 
 func GetUserFrontSidebarMenus(user models.User) ([]models.FrontSidebarMenu, error) {
 	allMenus := GetFrontSidebarMenus(bson.M{}, nil)
-	menus := lib.GenerateSidebarMenus(user.Permissions, allMenus)
+
+	userPermissions := make([]string, 0)
+	for _, userPermission := range user.Permissions {
+		userPermissions = append(userPermissions, userPermission.Id)
+	}
+
+	menus := lib.GenerateSidebarMenus(userPermissions, allMenus)
 
 	return menus, nil
 }
