@@ -60,7 +60,7 @@ export default function LoginPage() {
                 >
                     Forgot your password?
                 </a>
-                <Button type="submit" className="w-full">
+                <Button type="submit" className="w-full" color="primary">
                     Login
                 </Button>
                 <div

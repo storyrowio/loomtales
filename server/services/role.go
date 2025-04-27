@@ -52,7 +52,7 @@ func CreateRole(params models.Role) (bool, error) {
 	return true, nil
 }
 
-func GetRole(filter bson.M, opts *options.FindOneOptions) *models.Role {
+func GetRole(filter bson.M, opts *options.FindOneOptions, includeDetail bool) *models.Role {
 	var data models.Role
 	err := database.FindOne(RoleCollection, filter, opts).Decode(&data)
 	if err != nil {
@@ -61,6 +61,12 @@ func GetRole(filter bson.M, opts *options.FindOneOptions) *models.Role {
 		}
 		return nil
 	}
+
+	if includeDetail {
+		permissions := GetPermissions(bson.M{"id": bson.M{"$in": data.PermissionIds}}, nil)
+		data.Permissions = permissions
+	}
+
 	return &data
 }
 

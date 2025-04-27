@@ -112,6 +112,12 @@ func GetCurrentUser(r *http.Request) *models.User {
 
 	user := GetUser(bson.M{"email": email}, options.FindOne().SetProjection(bson.D{{"password", 0}}))
 
+	role := GetRole(bson.M{"id": user.RoleId}, nil, true)
+	if role != nil {
+		user.Permissions = role.Permissions
+		user.Role = *role
+	}
+
 	return user
 }
 

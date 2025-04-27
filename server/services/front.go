@@ -17,6 +17,12 @@ const FrontSidebarMenuCollection = "frontsidebarmenus"
 func GetFrontSidebarMenus(filters bson.M, opt *options.FindOptions) []models.FrontSidebarMenu {
 	results := make([]models.FrontSidebarMenu, 0)
 
+	if opt == nil {
+		opt = &options.FindOptions{}
+	}
+
+	opt.SetSort(bson.M{"id": 1})
+
 	cursor := database.Find(FrontSidebarMenuCollection, filters, opt)
 	for cursor.Next(context.Background()) {
 		var data models.FrontSidebarMenu

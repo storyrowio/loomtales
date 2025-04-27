@@ -141,7 +141,7 @@ func AdminMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		role := services.GetRole(bson.M{"id": user.RoleId}, nil)
+		role := services.GetRole(bson.M{"id": user.RoleId}, nil, false)
 		if role == nil {
 			c.Abort()
 			c.Writer.WriteHeader(http.StatusUnauthorized)

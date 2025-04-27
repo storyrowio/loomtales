@@ -1,27 +1,36 @@
 import useSWR from "swr";
-import {useState} from "react";
-import {DefaultSort} from "@/constants/constants.jsx";
 import FrontService from "@/services/FrontService.jsx";
-import {Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.jsx";
+import SettingService from "@/services/SettingService.jsx";
+import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import {useNavigate} from "react-router";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.jsx";
 import {EditIcon, TrashIcon} from "lucide-react";
+import {Badge} from "@/components/ui/badge.jsx";
+import {SettingTypes} from "@/constants/constants.jsx";
+import {useNavigate} from "react-router";
+import {SYSTEM_SETTING_PATH} from "@/constants/paths.jsx";
 
-export default function FrontSidebarMenuPage() {
+export default function SystemSettingPage() {
     const navigate = useNavigate();
-    const [filter, setFilter] = useState({sort: DefaultSort.name.value});
-
     const { data: resData } = useSWR(
-        [filter, '/api/front/sidebar-menus'],
-        () => FrontService.GetSidebarMenus(filter));
+        '/api/setting',
+        () => SettingService.GetSettings({}));
+    console.log(resData?.data)
+
+    const renderType = (type) => {
+        return (
+            <Badge variant="tonal" className={SettingTypes[type].className}>
+                {SettingTypes[type].name}
+            </Badge>
+        )
+    };
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>All Sidebar Menus</CardTitle>
                 <CardAction>
-                    <Button color="secondary" onClick={() => navigate('/app/front/sidebar-menu/create')}>
+                    <Button onClick={() => navigate('/app/system-setting/create')}>
                         Add Data
                     </Button>
                 </CardAction>
@@ -30,28 +39,24 @@ export default function FrontSidebarMenuPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">Menu Id</TableHead>
                             <TableHead>Name</TableHead>
-                            <TableHead>Path</TableHead>
-                            <TableHead>Section Title</TableHead>
-                            <TableHead className="max-w-1/4">Permissions</TableHead>
+                            <TableHead>Is Default?</TableHead>
+                            <TableHead>Type</TableHead>
                             <TableHead className="text-right">Option</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {resData?.length === 0 ? (
+                        {resData?.data?.length === 0 ? (
                             <TableRow>
                                 <TableCell>No Data</TableCell>
                             </TableRow>
-                        ) : resData?.map((e, i) => (
+                        ) : resData?.data?.map((e, i) => (
                             <TableRow key={i}>
-                                <TableCell className="font-medium">{e.id}</TableCell>
-                                <TableCell>{e.title}</TableCell>
-                                <TableCell>{e.path}</TableCell>
-                                <TableCell>{e.sectionTitle ? 'Yes' : 'No'}</TableCell>
-                                <TableCell className="max-w-96 !whitespace-normal">{e.permissions?.join(', ')}</TableCell>
+                                <TableCell>{e.name}</TableCell>
+                                <TableCell>{e.isDefault ? 'Yes' : 'No'}</TableCell>
+                                <TableCell>{renderType(e.type)}</TableCell>
                                 <TableCell className="flex justify-end gap-2">
-                                    <Button size="icon" variant="tonal" color="default">
+                                    <Button size="icon" variant="tonal" color="default" onClick={() => navigate(`${SYSTEM_SETTING_PATH}/update/${e.id}`)}>
                                         <EditIcon/>
                                     </Button>
                                     <Button size="icon" variant="tonal" color="destructive">

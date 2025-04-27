@@ -9,7 +9,7 @@ export default function AuthLayout() {
             <img
                 alt="background"
                 src={Background}
-                className="absolute z-0"/>
+                className="h-screen absolute z-0 object-cover"/>
             <div className="w-full max-w-sm md:max-w-4xl">
                 <div className="flex flex-col gap-6">
                     <Card className="overflow-hidden z-10 py-0">

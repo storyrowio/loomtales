@@ -4,20 +4,22 @@ import {useFormik} from "formik";
 import AuthService from "@/services/AuthService.jsx";
 import {useNavigate} from "react-router";
 import useSWR from "swr";
-import FrontService from "@/services/FrontService.jsx";
 import RolePermissionService from "@/services/RolePermissionService.jsx";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 import * as React from "react";
-import {Card, CardContent} from "@/components/ui/card.jsx";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Checkbox} from "@/components/ui/checkbox.jsx";
+import FrontService from "@/services/FrontService.jsx";
+import {Button} from "@/components/ui/button.jsx";
 
-export default function FrontSidebarMenuForm() {
+export default function FrontSidebarMenuForm(props) {
+    const { data } = props;
     const navigate = useNavigate();
     const { data: resPermissions } = useSWR('/api/admin/permission',
         () => RolePermissionService.GetPermissions({}));
 
     const formik = useFormik({
         initialValues: {
+            id: '',
             title: '',
             icon: '',
             path: '',
@@ -37,15 +39,31 @@ export default function FrontSidebarMenuForm() {
     };
 
     const handleSubmit = (values) => {
-        return AuthService.Login(values)
-            .then(() => navigate('/app'));
+        return FrontService.CreateSidebarMenus({
+            menus: [values]
+        }).then(() => navigate('/app/front/sidebar-menu'))
     };
 
     return (
         <Card>
+            <CardHeader>
+                <CardTitle>{data?.id ? 'Update Sidebar Menu' : 'Create Sidebar Menu'}</CardTitle>
+            </CardHeader>
             <CardContent>
                 <form
-                    className="grid gap-6">
+                    className="grid gap-6"
+                    onSubmit={formik.handleSubmit}>
+                    <div className="grid gap-1">
+                        <Label htmlFor="id">Menu Id</Label>
+                        <Input
+                            id="id"
+                            required
+                            placeholder="e.g. dashboard"
+                            name="id"
+                            onChange={formik.handleChange}
+                            value={formik.values.id}
+                        />
+                    </div>
                     <div className="grid gap-1">
                         <Label htmlFor="title">Title</Label>
                         <Input
@@ -60,7 +78,6 @@ export default function FrontSidebarMenuForm() {
                         <Label htmlFor="icon">Icon</Label>
                         <Input
                             id="icon"
-                            required
                             name="icon"
                             onChange={formik.handleChange}
                             value={formik.values.icon}
@@ -70,7 +87,6 @@ export default function FrontSidebarMenuForm() {
                         <Label htmlFor="path">Path</Label>
                         <Input
                             id="path"
-                            required
                             name="path"
                             onChange={formik.handleChange}
                             value={formik.values.path}
@@ -105,6 +121,11 @@ export default function FrontSidebarMenuForm() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <Button type="submit">
+                            Submit
+                        </Button>
                     </div>
                 </form>
             </CardContent>

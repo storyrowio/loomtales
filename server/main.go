@@ -64,7 +64,7 @@ func main() {
 		{
 			front := protected.Group("/front")
 			{
-				front.GET("/sidebar-menus", controllers.GetUserFrontSidebarMenus)
+				front.GET("/sidebar-menu", controllers.GetUserFrontSidebarMenus)
 			}
 
 			protected.GET("/profile", controllers.GetProfile)
@@ -83,8 +83,8 @@ func main() {
 			{
 				adminFront := admin.Group("/front")
 				{
-					adminFront.GET("/sidebar-menus", controllers.GetFrontSidebarMenus)
-					adminFront.POST("/sidebar-menus", controllers.CreateFrontSidebarMenus)
+					adminFront.GET("/sidebar-menu", controllers.GetFrontSidebarMenus)
+					adminFront.POST("/sidebar-menu", controllers.CreateFrontSidebarMenus)
 				}
 
 				admin.GET("/permission", controllers.GetPermissions)
@@ -94,6 +94,12 @@ func main() {
 				admin.POST("/role", controllers.CreateRole)
 				admin.PATCH("/role/:id", controllers.UpdateRole)
 				admin.DELETE("/role/:id", controllers.DeleteRole)
+
+				admin.GET("/setting", controllers.GetSettings)
+				admin.POST("/setting", controllers.CreateSetting)
+				admin.GET("/setting/:id", controllers.GetSettingById)
+				admin.PATCH("/setting/:id", controllers.UpdateSetting)
+				admin.DELETE("/setting/:id", controllers.DeleteSetting)
 			}
 		}
 	}

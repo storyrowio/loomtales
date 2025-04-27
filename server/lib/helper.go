@@ -94,6 +94,14 @@ func MenuHasAnyPermission(menuPermissions []string, userPermissions []string) bo
 		}
 	}
 
+	for _, perm := range userPermissions {
+		for _, permMenu := range menuPermissions {
+			if permMenu == perm {
+				return true
+			}
+		}
+	}
+
 	return len(menuPermissions) == 0
 }
 

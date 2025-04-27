@@ -1,4 +1,4 @@
-import {ChevronRight} from "lucide-react"
+import {ChevronRight, ImageIcon} from "lucide-react"
 
 import {
     Collapsible,
@@ -22,13 +22,17 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {cn} from "@/lib/utils.js";
+import {useLocation, useNavigate} from "react-router";
+import {AppMenuIcons, SidebarMenusOrder} from "@/constants/menus.jsx";
+import {useMemo} from "react";
 
-const ItemButtonContent = ({item, active}) => {
+const ItemButtonContent = ({item, active, icon}) => {
+    const Icon = icon;
     const textClassName = cn('text-neutral-700', active && 'text-white');
 
     return (
         <>
-            {item.icon && <item.icon className={active ? 'text-white' : 'text-neutral-700'}/>}
+            {item.icon && <Icon className={active ? 'text-white' : 'text-neutral-700'}/>}
             <span className={textClassName}>{item.title}</span>
             {item.items && (
                 <ChevronRight className={cn(
@@ -41,14 +45,25 @@ const ItemButtonContent = ({item, active}) => {
 };
 
 export function NavMain({items, miniSidebar}) {
-    const { isMobile } = useSidebar()
+    const { isMobile } = useSidebar();
+    const { pathname } = useLocation();
+    const navigate = useNavigate();
+
+    const orderedMenus = useMemo(() => {
+        return [...items].sort((a, b) => {
+            const indexA = SidebarMenusOrder.indexOf(a.id);
+            const indexB = SidebarMenusOrder.indexOf(b.id);
+            return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
+        })
+    }, [items]);
 
     return (
         <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-                {items?.map((item, i) => {
-                    const active = item.isActive;
+                {orderedMenus?.map((item, i) => {
+                    const active = pathname === `/app${item.path}`;
+                    const Icon = AppMenuIcons[item.icon] ?? ImageIcon;
+
                     const buttonClassName = cn(
                         'h-10 cursor-pointer',
                         active ? 'bg-primary-500 hover:!bg-primary-600' : 'bg-transparent'
@@ -59,13 +74,17 @@ export function NavMain({items, miniSidebar}) {
                         active ? 'bg-primary-500 hover:!bg-primary-600' : 'bg-transparent'
                     )
 
-                    if (miniSidebar && !isMobile) {
+                    if (item.sectionTitle) {
+                        return (
+                            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+                        )
+                    } else if (miniSidebar && !isMobile) {
                         return (
                             <DropdownMenu key={i}>
                                 <SidebarMenuItem>
                                     <DropdownMenuTrigger asChild className="cursor-pointer">
                                         <SidebarMenuButton className={miniSidebarButtonClassName}>
-                                            {item.icon && <item.icon className={active ? 'text-white' : 'text-neutral-700'}/>}
+                                            {item.icon && <Icon className={active ? 'text-white' : 'text-neutral-700'}/>}
                                         </SidebarMenuButton>
                                     </DropdownMenuTrigger>
                                     {item.items?.length > 0 ? (
@@ -89,13 +108,13 @@ export function NavMain({items, miniSidebar}) {
                             <Collapsible
                                 key={i}
                                 asChild
-                                defaultOpen={item.isActive}
+                                defaultOpen={active}
                                 className="group/collapsible"
                             >
                                 <SidebarMenuItem>
                                     <CollapsibleTrigger asChild >
                                         <SidebarMenuButton tooltip={item.title} className={buttonClassName}>
-                                            <ItemButtonContent item={item} active={active}/>
+                                            <ItemButtonContent item={item} active={active} icon={Icon}/>
                                         </SidebarMenuButton>
                                     </CollapsibleTrigger>
                                     <CollapsibleContent>
@@ -118,8 +137,8 @@ export function NavMain({items, miniSidebar}) {
 
                     return (
                         <SidebarMenuItem key={i}>
-                            <SidebarMenuButton tooltip={item.title} className={buttonClassName}>
-                                <ItemButtonContent item={item} active={active}/>
+                            <SidebarMenuButton tooltip={item.title} className={buttonClassName} onClick={() => navigate(`/app${item.path}`)}>
+                                <ItemButtonContent item={item} active={active} icon={Icon}/>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     )
