@@ -3,7 +3,7 @@ import {
     CalendarCheckIcon,
     FolderOpenIcon,
     LayoutDashboardIcon,
-    NotepadTextDashedIcon, PanelLeftDashedIcon, SettingsIcon
+    NotepadTextDashedIcon, PanelLeftDashedIcon, SettingsIcon, WaypointsIcon
 } from "lucide-react";
 
 export const AppMenuIcons = {
@@ -13,7 +13,8 @@ export const AppMenuIcons = {
     template: NotepadTextDashedIcon,
     frontSidebarMenu: PanelLeftDashedIcon,
     socialAccount: CableIcon,
-    setting: SettingsIcon
+    setting: SettingsIcon,
+    role: WaypointsIcon
 };
 
 export const SidebarMenusOrder = [
@@ -24,5 +25,6 @@ export const SidebarMenusOrder = [
     'template',
     'setting',
     'systemSetting',
-    'frontSidebarMenu'
+    'frontSidebarMenu',
+    'role'
 ];

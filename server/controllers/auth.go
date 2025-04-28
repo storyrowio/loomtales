@@ -74,8 +74,9 @@ func SignUp(c *gin.Context) {
 	// Send email
 	verificationUrl := os.Getenv("FRONTEND_URL") + "/verify/"
 	mailData := models.VerificationMail{
-		Name: request.Name,
-		Link: verificationUrl + *token,
+		Name:         request.Name,
+		Link:         verificationUrl + *token,
+		SupportEmail: os.Getenv("SUPPORT_EMAIL"),
 	}
 	mailRequest := models.SendMailRequest{
 		To:           request.Email,
@@ -84,7 +85,7 @@ func SignUp(c *gin.Context) {
 		TemplatePath: "templates/verification.html",
 	}
 
-	err = lib.SendEmail(mailRequest)
+	err = services.SendMail(mailRequest)
 	if err != nil {
 		log.Println("Error sending email:", err)
 	}
@@ -93,7 +94,7 @@ func SignUp(c *gin.Context) {
 		Id:    user.Id,
 		Name:  user.Name,
 		Email: user.Email,
-		//Token: *token,
+		Token: *token,
 	}
 
 	c.JSON(http.StatusOK, models.Response{Data: result})
@@ -211,6 +212,35 @@ func Activate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, models.Response{Data: "Activation Success"})
 	return
+}
+
+func ResendConfirmation(c *gin.Context) {
+	profile := services.GetCurrentUser(c.Request)
+
+	token, err := lib.GenerateToken(profile.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	// Send email
+	verificationUrl := os.Getenv("FRONTEND_URL") + "/verify/"
+	mailData := models.VerificationMail{
+		Name: profile.Name,
+		Link: verificationUrl + *token,
+	}
+	mailRequest := models.SendMailRequest{
+		To:           profile.Email,
+		Subject:      "Your Verification Link",
+		Data:         mailData,
+		TemplatePath: "templates/verification.html",
+	}
+
+	err = services.SendMail(mailRequest)
+	if err != nil {
+		log.Println("Error sending email:", err)
+	}
+
 }
 
 func ForgotPassword(c *gin.Context) {

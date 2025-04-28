@@ -69,6 +69,7 @@ func main() {
 
 			protected.GET("/profile", controllers.GetProfile)
 			protected.PATCH("/profile", controllers.UpdateProfile)
+			protected.POST("/resend/confirmation", controllers.ResendConfirmation)
 
 			protected.GET("/role/:id", controllers.GetRoleById)
 			protected.POST("/role/attach-permission", controllers.AttachPermissionsToRole)
