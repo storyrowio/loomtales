@@ -7,6 +7,7 @@ import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, Table
 import {Button} from "@/components/ui/button.jsx";
 import {useNavigate} from "react-router";
 import {EditIcon, TrashIcon} from "lucide-react";
+import DeleteConfirmation from "@/components/shared/dialog/DeleteConfirmation.jsx";
 
 export default function FrontSidebarMenuPage() {
     const navigate = useNavigate();
@@ -54,9 +55,10 @@ export default function FrontSidebarMenuPage() {
                                     <Button size="icon" variant="tonal" color="default">
                                         <EditIcon/>
                                     </Button>
-                                    <Button size="icon" variant="tonal" color="destructive">
-                                        <TrashIcon/>
-                                    </Button>
+                                    <DeleteConfirmation
+                                        triggerButton={<Button size="icon" variant="tonal" color="destructive">
+                                            <TrashIcon/>
+                                        </Button>}/>
                                 </TableCell>
                             </TableRow>
                         ))}
