@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func GetRoles(c *gin.Context) {
+func GetWorkspaces(c *gin.Context) {
 	var query models.Query
 
 	err := c.ShouldBindQuery(&query)
@@ -22,18 +22,23 @@ func GetRoles(c *gin.Context) {
 	filters := query.GetQueryFind()
 	opts := query.GetOptions()
 
-	results := services.GetRolesWithPagination(filters, opts, query)
+	results := services.GetWorkspacesWithPagination(filters, opts, query)
 
 	c.JSON(http.StatusOK, models.Response{Data: results})
 	return
 }
 
-func CreateRole(c *gin.Context) {
-	var request models.Role
-
+func CreateWorkspace(c *gin.Context) {
+	var request models.Workspace
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(400, models.Response{Data: err.Error()})
+		return
+	}
+
+	profile := services.GetCurrentUser(c.Request)
+	if profile == nil {
+		c.JSON(http.StatusUnauthorized, models.Response{Data: http.StatusText(http.StatusUnauthorized)})
 		return
 	}
 
@@ -41,7 +46,12 @@ func CreateRole(c *gin.Context) {
 	request.CreatedAt = time.Now()
 	request.UpdatedAt = time.Now()
 
-	_, err = services.CreateRole(request)
+	request.Members = append(request.Members, models.WorkspaceMemberRole{
+		UserId: profile.Id,
+		RoleId: profile.RoleId,
+	})
+
+	_, err = services.CreateWorkspace(request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return
@@ -51,10 +61,10 @@ func CreateRole(c *gin.Context) {
 	return
 }
 
-func GetRoleById(c *gin.Context) {
+func GetWorkspaceById(c *gin.Context) {
 	id := c.Param("id")
 
-	result := services.GetRole(bson.M{"id": id}, nil, false)
+	result := services.GetWorkspace(bson.M{"id": id}, nil, false)
 	if result == nil {
 		c.JSON(http.StatusNotFound, models.Result{Data: "Data Not Found"})
 		return
@@ -63,10 +73,10 @@ func GetRoleById(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{Data: result})
 }
 
-func UpdateRole(c *gin.Context) {
+func UpdateWorkspace(c *gin.Context) {
 	id := c.Param("id")
 
-	data := services.GetRole(bson.M{"id": id}, nil, false)
+	data := services.GetWorkspace(bson.M{"id": id}, nil, false)
 	if data == nil {
 		c.JSON(http.StatusNotFound, models.Result{Data: "Data Not Found"})
 		return
@@ -79,7 +89,7 @@ func UpdateRole(c *gin.Context) {
 		return
 	}
 
-	_, err = services.UpdateRole(id, request)
+	_, err = services.UpdateWorkspace(id, request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return
@@ -88,42 +98,14 @@ func UpdateRole(c *gin.Context) {
 	c.JSON(200, models.Response{Data: request})
 }
 
-func DeleteRole(c *gin.Context) {
+func DeleteWorkspace(c *gin.Context) {
 	id := c.Param("id")
 
-	_, err := services.DeleteRole(id)
+	_, err := services.DeleteWorkspace(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: "Failed Delete Data"})
 		return
 	}
 
 	c.JSON(http.StatusOK, models.Response{Data: "Success"})
-}
-
-func AttachPermissionsToRole(c *gin.Context) {
-	request := struct {
-		RoleId      string   `json:"roleId"`
-		Permissions []string `json:"permissions"`
-	}{}
-	err := c.ShouldBindJSON(&request)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
-		return
-	}
-
-	role := services.GetRole(bson.M{"id": request.RoleId}, nil, false)
-	if role == nil {
-		c.JSON(http.StatusNotFound, models.Response{Data: err.Error()})
-		return
-	}
-
-	role.UpdatedAt = time.Now()
-	role.PermissionIds = append(role.PermissionIds, request.Permissions...)
-	_, err = services.UpdateRole(role.Id, role)
-	if err != nil {
-		c.JSON(http.StatusNotFound, models.Response{Data: err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, models.Response{Data: role})
 }

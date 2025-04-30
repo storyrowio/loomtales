@@ -3,7 +3,14 @@ import {
     CalendarCheckIcon,
     FolderOpenIcon,
     LayoutDashboardIcon,
-    NotepadTextDashedIcon, PanelLeftDashedIcon, SettingsIcon, WaypointsIcon
+    ListTodoIcon,
+    NotepadTextDashedIcon,
+    PanelLeftDashedIcon,
+    ReceiptTextIcon,
+    SettingsIcon,
+    UsersRoundIcon,
+    WaypointsIcon,
+    WebhookIcon
 } from "lucide-react";
 
 export const AppMenuIcons = {
@@ -13,8 +20,12 @@ export const AppMenuIcons = {
     template: NotepadTextDashedIcon,
     frontSidebarMenu: PanelLeftDashedIcon,
     socialAccount: CableIcon,
+    apiSetting: WebhookIcon,
     setting: SettingsIcon,
-    role: WaypointsIcon
+    role: WaypointsIcon,
+    member: UsersRoundIcon,
+    task: ListTodoIcon,
+    billing: ReceiptTextIcon
 };
 
 export const SidebarMenusOrder = [
@@ -23,7 +34,13 @@ export const SidebarMenusOrder = [
     'calendar',
     'contentLibrary',
     'template',
+    'socialAccount',
+    'apiSetting',
+    'team',
+    'member',
+    'task',
     'setting',
+    'billing',
     'systemSetting',
     'frontSidebarMenu',
     'role'

@@ -15,7 +15,7 @@ const CreateRole = (params) => {
 };
 
 const GetRole = (id) => {
-    return Api.Instance.get(`/admin${rolePath}/${id}`)
+    return Api.Instance.get(`${rolePath}/${id}`)
         .then(res => res?.data?.data);
 };
 

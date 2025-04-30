@@ -71,6 +71,8 @@ func main() {
 			protected.PATCH("/profile", controllers.UpdateProfile)
 			protected.POST("/resend/confirmation", controllers.ResendConfirmation)
 
+			protected.POST("/member/invite", controllers.InviteMember)
+
 			protected.GET("/role/:id", controllers.GetRoleById)
 			protected.POST("/role/attach-permission", controllers.AttachPermissionsToRole)
 
@@ -80,12 +82,21 @@ func main() {
 			protected.PATCH("/user/:id", controllers.UpdateUser)
 			protected.DELETE("/user/:id", controllers.DeleteUser)
 
+			protected.GET("/workspace", controllers.GetWorkspaces)
+			protected.POST("/workspace", controllers.CreateWorkspace)
+			protected.GET("/workspace/:id", controllers.GetWorkspaceById)
+			protected.PATCH("/workspace/:id", controllers.UpdateWorkspace)
+			protected.DELETE("/workspace/:id", controllers.DeleteWorkspace)
+
 			admin := protected.Group("/admin", config.AdminMiddleware())
 			{
 				adminFront := admin.Group("/front")
 				{
 					adminFront.GET("/sidebar-menu", controllers.GetFrontSidebarMenus)
 					adminFront.POST("/sidebar-menu", controllers.CreateFrontSidebarMenus)
+					adminFront.GET("/sidebar-menu/:id", controllers.GetFrontSidebarMenu)
+					adminFront.PATCH("/sidebar-menu/:id", controllers.UpdateFrontSidebarMenu)
+					adminFront.DELETE("/sidebar-menu/:id", controllers.DeleteFrontSidebarMenu)
 				}
 
 				admin.GET("/permission", controllers.GetPermissions)

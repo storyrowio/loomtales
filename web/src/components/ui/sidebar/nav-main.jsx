@@ -66,7 +66,7 @@ export function NavMain({items, miniSidebar}) {
 
                     const buttonClassName = cn(
                         'h-10 cursor-pointer',
-                        active ? 'bg-primary-500 hover:!bg-primary-600' : 'bg-transparent'
+                        active ? 'bg-primary-500 hover:!bg-primary/90' : 'bg-transparent'
                     );
 
                     const miniSidebarButtonClassName = cn(
@@ -76,7 +76,7 @@ export function NavMain({items, miniSidebar}) {
 
                     if (item.sectionTitle) {
                         return (
-                            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+                            <SidebarGroupLabel key={i} className="mt-3 text-gray-400 text-[11px] uppercase">{item.title}</SidebarGroupLabel>
                         )
                     } else if (miniSidebar && !isMobile) {
                         return (

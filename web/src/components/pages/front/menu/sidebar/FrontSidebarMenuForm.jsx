@@ -10,6 +10,8 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx
 import {Checkbox} from "@/components/ui/checkbox.jsx";
 import FrontService from "@/services/FrontService.jsx";
 import {Button} from "@/components/ui/button.jsx";
+import {useEffect, useRef} from "react";
+import {FRONT_SIDEBAR_MENU_PATH} from "@/constants/paths.jsx";
 
 export default function FrontSidebarMenuForm(props) {
     const { data } = props;
@@ -30,6 +32,14 @@ export default function FrontSidebarMenuForm(props) {
         onSubmit: values => handleSubmit(values)
     });
 
+    const mounted = useRef(false);
+    useEffect(() => {
+        if (data?.id && !mounted.current) {
+            formik.setValues(data);
+            mounted.current = true;
+        }
+    }, [data, data?.id, formik]);
+
     const handleChangePermission = (id) => {
         if (formik.values.permissions.includes(id)) {
             formik.setFieldValue('permissions', formik.values.permissions.filter(e => e !== id));
@@ -38,10 +48,18 @@ export default function FrontSidebarMenuForm(props) {
         }
     };
 
-    const handleSubmit = (values) => {
+    const submit = (params) => {
+        if (data?.id) {
+            return FrontService.UpdateSidebarMenu(data?.id, params);
+        }
+
         return FrontService.CreateSidebarMenus({
-            menus: [values]
-        }).then(() => navigate('/app/front/sidebar-menu'))
+            menus: [params]
+        });
+    };
+
+    const handleSubmit = (values) => {
+        return submit(values).then(() => navigate(FRONT_SIDEBAR_MENU_PATH))
     };
 
     return (

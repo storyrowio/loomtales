@@ -1,18 +1,21 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar.jsx";
 import {AppSidebar} from "@/components/ui/sidebar/app-sidebar.jsx";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import AppNavbarProfile from "@/layouts/app/components/AppNavbarProfile.jsx";
 import AppNavbarNotification from "@/layouts/app/components/AppNavbarNotification.jsx";
 import {Outlet} from "react-router";
 import {Menubar} from "@/components/ui/menubar.jsx";
 import FrontService from "@/services/FrontService.jsx";
-import {useDispatch} from "@/store/index.jsx";
+import {useDispatch, useSelector} from "@/store/index.jsx";
 import {ThemeActions} from "@/store/slices/ThemeSlice.jsx";
 import AuthService from "@/services/AuthService.jsx";
 import {ProfileActions} from "@/store/slices/ProfileSlice.jsx";
+import WorkspaceService from "@/services/WorkspaceService.jsx";
+import {AppActions} from "@/store/slices/AppSlice.jsx";
 
 export default function AppLayout() {
     const dispatch = useDispatch();
+    const { id } = useSelector(state => state.profile);
     const [isMiniSidebar, setIsMiniSidebar] = useState(false);
 
     const fetchInitial = async () => {
@@ -23,9 +26,26 @@ export default function AppLayout() {
             });
     };
 
+    const fetchWorkspace = useCallback(() => {
+        return WorkspaceService.GetWorkspaces({user: id})
+            .then(res => {
+                dispatch(AppActions.setWorkspaces(res?.data));
+                if (res?.data?.length > 0) {
+                    dispatch(AppActions.setActiveWorkspace(res?.data[0]));
+                }
+            })
+    }, [dispatch, id]);
+
     useEffect(() => {
         fetchInitial();
     }, []);
+
+    const mounted = useRef(false);
+    useEffect(() => {
+        if (id && !mounted.current) {
+            fetchWorkspace();
+        }
+    }, [id, fetchWorkspace]);
 
     return (
         <SidebarProvider className="bg-neutral-400">
