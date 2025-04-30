@@ -21,3 +21,11 @@ type VerificationMail struct {
 	Link         string `json:"link"`
 	SupportEmail string `json:"supportEmail"`
 }
+
+type InvitationMail struct {
+	InviterName   string `json:"inviterName"`
+	WorkspaceName string `json:"workspaceName"`
+	Email         string `json:"email"`
+	Link          string `json:"link"`
+	SupportEmail  string `json:"supportEmail"`
+}

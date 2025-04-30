@@ -4,20 +4,24 @@ import {Button} from "@/components/ui/button.jsx";
 import {useFormik} from "formik";
 import AuthService from "@/services/AuthService.jsx";
 import {useNavigate} from "react-router";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const formik = useFormik({
         initialValues: {
-            email: 'admin@loomtales.com',
-            password: 'admin'
+            email: 'damayartdesign@gmail.com',
+            password: 'putri12345'
         },
         onSubmit: values => handleSubmit(values)
     });
 
     const handleSubmit = (values) => {
         return AuthService.Login(values)
-            .then(() => navigate('/app'));
+            .then(() => navigate('/app'))
+            .catch(err => {
+                formik.setFieldError('credential', err?.response?.data?.message);
+            });
     };
 
     return (
@@ -29,6 +33,11 @@ export default function LoginPage() {
                         Login to your Loomtales account
                     </p>
                 </div>
+                {formik.errors.credential && (
+                    <Alert variant="tonal" color="destructive">
+                        <AlertDescription>{formik.errors.credential}</AlertDescription>
+                    </Alert>
+                )}
                 <div className="grid gap-1">
                     <Label htmlFor="email">Email</Label>
                     <Input

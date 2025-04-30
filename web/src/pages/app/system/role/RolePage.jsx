@@ -16,7 +16,6 @@ export default function RolePage() {
     const { data: resData } = useSWR(
         '/api/setting',
         () => RolePermissionService.GetRoles({}));
-    console.log(resData?.data)
 
     return (
         <Card>
@@ -49,7 +48,11 @@ export default function RolePage() {
                                 <TableCell>{e.code}</TableCell>
                                 <TableCell>{e.permissionIds.length} Permissions</TableCell>
                                 <TableCell className="flex justify-end gap-2">
-                                    <Button size="icon" variant="tonal" color="default" onClick={() => navigate(`${SYSTEM_SETTING_PATH}/update/${e.id}`)}>
+                                    <Button
+                                        size="icon"
+                                        variant="tonal"
+                                        color="default"
+                                        onClick={() => navigate(`${ROLE_PATH}/update/${e.id}`)}>
                                         <EditIcon/>
                                     </Button>
                                     <Button size="icon" variant="tonal" color="destructive">

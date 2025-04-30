@@ -54,7 +54,10 @@ export default function RoleForm(props) {
 
     const handleSubmit = (values) => {
         return submit({...values})
-            .then(() => navigate(ROLE_PATH))
+            .then(() => {
+                navigate(ROLE_PATH);
+                formik.handleReset();
+            })
     };
 
     return (
@@ -114,7 +117,10 @@ export default function RoleForm(props) {
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                                 {resPermissions?.map((e, i) => (
                                     <div key={i} className="py-3 items-top flex space-x-2">
-                                        <Checkbox id={e.id} onCheckedChange={() => handleChangePermission(e.id)}/>
+                                        <Checkbox
+                                            id={e.id}
+                                            checked={formik.values.permissionIds.includes(e.id)}
+                                            onCheckedChange={() => handleChangePermission(e.id)}/>
                                         <div className="grid gap-1.5 leading-none">
                                             <label
                                                 htmlFor={e.id}

@@ -1,22 +1,21 @@
-import useSWR from "swr";
+import {useNavigate} from "react-router";
 import {useState} from "react";
 import {DefaultSort} from "@/constants/constants.jsx";
-import FrontService from "@/services/FrontService.jsx";
-import {Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card.jsx";
-import {Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.jsx";
+import useSWR from "swr";
+import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import {useNavigate} from "react-router";
-import {EditIcon, TrashIcon} from "lucide-react";
-import DeleteConfirmation from "@/components/shared/dialog/DeleteConfirmation.jsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.jsx";
 import {FRONT_SIDEBAR_MENU_PATH} from "@/constants/paths.jsx";
+import {EditIcon, TrashIcon} from "lucide-react";
+import MemberService from "@/services/MemberService.jsx";
 
-export default function FrontSidebarMenuPage() {
+export default function MemberPage() {
     const navigate = useNavigate();
     const [filter, setFilter] = useState({sort: DefaultSort.name.value});
 
     const { data: resData } = useSWR(
-        [filter, '/api/front/sidebar-menus'],
-        () => FrontService.GetSidebarMenus(filter));
+        [filter, '/api/member'],
+        () => MemberService.GetMembers(filter));
 
     return (
         <Card>
@@ -32,8 +31,7 @@ export default function FrontSidebarMenuPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[100px]">Menu Id</TableHead>
-                            <TableHead>Name</TableHead>
+                            <TableHead>Email</TableHead>
                             <TableHead>Path</TableHead>
                             <TableHead>Section Title</TableHead>
                             <TableHead className="max-w-1/4">Permissions</TableHead>
@@ -60,10 +58,9 @@ export default function FrontSidebarMenuPage() {
                                         onClick={() => navigate(`${FRONT_SIDEBAR_MENU_PATH}/update/${e.id}`)}>
                                         <EditIcon/>
                                     </Button>
-                                    <DeleteConfirmation
-                                        triggerButton={<Button size="icon" variant="tonal" color="destructive">
-                                            <TrashIcon/>
-                                        </Button>}/>
+                                    <Button size="icon" variant="tonal" color="destructive">
+                                        <TrashIcon/>
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}

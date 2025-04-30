@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>You’ve been invited to join a workspace on Loomtales</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #F9FAFB;
+        }
+        button {
+            width: 180px;
+            height: 45px;
+            background: #6366F1;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+        }
+        hr {
+            margin-top: 30px;
+            margin-bottom: 50px;
+            border: 1px solid #E5E6E8;
+        }
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 50px;
+            background: #FFFFFF;
+            border: 1px solid #E5E6E8;
+            border-radius: 20px;
+        }
+        .logo {
+            margin-bottom: 40px;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .bottom-content {
+            text-align: center;
+        }
+        .bottom {
+            font-size: 12px;
+            color: #5F5E63;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img alt="logo" src="cid:logo.png" width="200" class="logo">
+    <p class="bold">Hi, You got invitation from {{ .InviterName }}</p>
+    <p style="margin-bottom: 40px">
+        {{ .InviterName }} has invited you to join the {{ .WorkspaceName }} workspace on Loomtales, a powerful project management platform built for getting things done.
+    </p>
+    <p>Click the button below to accept the invitation and start collaborating:</p>
+
+    <a href="{{ .Link }}">
+        <button>
+            Join Now
+        </button>
+    </a>
+
+    <p style="margin-top: 40px">
+        If you weren’t expecting this invitation, feel free to ignore this email.
+
+        See you inside,
+    </p>
+
+    <div style="margin-top: 60px">
+        <p>Thank you</p>
+
+        <p>Best regards, Loomtales Team</p>
+    </div>
+
+    <hr/>
+
+    <div class="bottom-content">
+        <p class="bottom">
+            <strong>Need help?</strong>
+            Contact us at <a href="">{{ .SupportEmail }}</a>
+        </p>
+        <p class="bottom">Loomtales</p>
+        <p class="bottom">Banyuwangi, Indonesia</p>
+        <p class="bottom">© 2025 Loomtales. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>
