@@ -12,17 +12,26 @@ import (
 
 func GetRoles(c *gin.Context) {
 	var query models.Query
-
 	err := c.ShouldBindQuery(&query)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return
 	}
 
+	profile := services.GetCurrentUser(c.Request)
+
 	filters := query.GetQueryFind()
 	opts := query.GetOptions()
 
-	results := services.GetRolesWithPagination(filters, opts, query)
+	roles := services.GetRoles(filters, opts)
+
+	results := make([]models.Role, 0)
+	for _, role := range roles {
+		if profile.Role.RoleType != models.SystemAdminRole && role.RoleType == models.SystemAdminRole {
+			continue
+		}
+		results = append(results, role)
+	}
 
 	c.JSON(http.StatusOK, models.Response{Data: results})
 	return
@@ -30,7 +39,6 @@ func GetRoles(c *gin.Context) {
 
 func CreateRole(c *gin.Context) {
 	var request models.Role
-
 	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(400, models.Response{Data: err.Error()})

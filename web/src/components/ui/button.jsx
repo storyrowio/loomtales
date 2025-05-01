@@ -21,7 +21,8 @@ const buttonVariants = cva(
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9 rounded-full",
+        icon: "size-9",
+        iconRounded: "size-9 rounded-full"
       },
       color: {
         default: "bg-background text-secondary-foreground hover:text-accent-foreground",
@@ -36,6 +37,16 @@ const buttonVariants = cva(
         variant: "ghost",
         color: "default",
         className: "text-accent-foreground"
+      },
+      {
+        variant: "outline",
+        color: "default",
+        className: "border-muted-foreground text-muted-foreground hover:text-secondary-foreground hover:!bg-muted-foreground/10"
+      },
+      {
+        variant: "outline",
+        color: "primary",
+        className: "border-primary text-primary hover:text-primary-700 hover:!bg-primary/10"
       },
       {
         variant: "tonal",

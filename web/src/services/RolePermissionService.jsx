@@ -5,8 +5,8 @@ import {AUTH_TOKEN} from "@/constants/storage.jsx";
 const rolePath = "/role";
 
 const GetRoles = (query) => {
-    return Api.Instance.get('/admin/role', {params: query})
-        .then(res => res?.data);
+    return Api.Instance.get(rolePath, {params: query})
+        .then(res => res?.data?.data);
 };
 
 const CreateRole = (params) => {

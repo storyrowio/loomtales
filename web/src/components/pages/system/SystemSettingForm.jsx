@@ -169,7 +169,9 @@ export default function SystemSettingForm(props) {
                         </div>
                         <div className="grid gap-1">
                             <Label htmlFor="name">Type</Label>
-                            <Select value={formik.values.type} onValueChange={(val) => formik.setFieldValue('type', val)}>
+                            <Select
+                                value={formik.values.type}
+                                onValueChange={(val) => formik.setFieldValue('type', val)}>
                                 <SelectTrigger
                                     className="w-full"
                                     aria-label="Select a value">

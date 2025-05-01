@@ -72,7 +72,10 @@ func main() {
 			protected.POST("/resend/confirmation", controllers.ResendConfirmation)
 
 			protected.POST("/member/invite", controllers.InviteMember)
+			protected.GET("/member/:workspaceId", controllers.GetMembers)
+			protected.PATCH("/member/role", controllers.UpdateMemberRole)
 
+			protected.GET("/role", controllers.GetRoles)
 			protected.GET("/role/:id", controllers.GetRoleById)
 			protected.POST("/role/attach-permission", controllers.AttachPermissionsToRole)
 
@@ -102,7 +105,6 @@ func main() {
 				admin.GET("/permission", controllers.GetPermissions)
 				admin.POST("/permission", controllers.CreatePermissions)
 
-				admin.GET("/role", controllers.GetRoles)
 				admin.POST("/role", controllers.CreateRole)
 				admin.PATCH("/role/:id", controllers.UpdateRole)
 				admin.DELETE("/role/:id", controllers.DeleteRole)

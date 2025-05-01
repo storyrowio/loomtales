@@ -14,6 +14,16 @@ import (
 	"time"
 )
 
+func GetMembers(c *gin.Context) {
+	workspaceId := c.Param("workspaceId")
+
+	invitation := services.GetMemberInvitations(bson.M{"workspaceId": workspaceId}, nil)
+	workspace := services.GetWorkspace(bson.M{"id": workspaceId}, nil, true)
+	members := workspace.ConvertWorkspaceMemberResult(invitation)
+
+	c.JSON(http.StatusOK, models.Response{Data: members})
+}
+
 func InviteMember(c *gin.Context) {
 	var request models.InviteMemberRequest
 	err := c.ShouldBindJSON(&request)
@@ -33,39 +43,77 @@ func InviteMember(c *gin.Context) {
 		c.JSON(http.StatusNotFound, models.Response{Data: fmt.Sprintf("workspace %s does not exist", request.WorkspaceId)})
 	}
 
-	token, err := lib.GenerateToken(request.Email)
+	for _, email := range request.Emails {
+		token, err := lib.GenerateToken(email)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+			return
+		}
+
+		invitationConfirmUrl := fmt.Sprintf("%s/invite-member-confirm/%s", os.Getenv("FRONTEND_URL"), token)
+		mailData := models.InvitationMail{
+			InviterName:   profile.Name,
+			WorkspaceName: workspace.Name,
+			Email:         email,
+			Link:          invitationConfirmUrl,
+			SupportEmail:  os.Getenv("SUPPORT_EMAIL"),
+		}
+		mailRequest := models.SendMailRequest{
+			To:           email,
+			Subject:      "You’ve been invited to join a workspace on Loomtales.",
+			Data:         mailData,
+			TemplatePath: "templates/invitation-member.html",
+		}
+
+		err = services.SendMail(mailRequest)
+		if err != nil {
+			log.Println("Error sending email:", err)
+			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		}
+
+		_, err = services.CreateMemberInvitation(models.MemberInvitation{
+			WorkspaceId: workspace.Id,
+			InviterId:   profile.Id,
+			Email:       email,
+			ExpiresAt:   time.Now().Add(time.Hour * 24),
+			Status:      models.PendingMemberInvitation,
+		})
+	}
+
+	c.JSON(http.StatusOK, models.Response{Data: "Success"})
+}
+
+func UpdateMemberRole(c *gin.Context) {
+	request := struct {
+		WorkspaceId string `json:"workspaceId"`
+		UserId      string `json:"userId"`
+		RoleId      string `json:"roleId"`
+	}{}
+
+	err := c.ShouldBindJSON(&request)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return
 	}
 
-	invitationConfirmUrl := fmt.Sprintf("%s/invite-member-confirm/%s", os.Getenv("FRONTEND_URL"), token)
-	mailData := models.InvitationMail{
-		InviterName:   profile.Name,
-		WorkspaceName: workspace.Name,
-		Email:         request.Email,
-		Link:          invitationConfirmUrl,
-		SupportEmail:  os.Getenv("SUPPORT_EMAIL"),
-	}
-	mailRequest := models.SendMailRequest{
-		To:           request.Email,
-		Subject:      "You’ve been invited to join a workspace on Loomtales.",
-		Data:         mailData,
-		TemplatePath: "templates/invitation-member.html",
+	workspace := services.GetWorkspace(bson.M{"id": request.WorkspaceId}, nil, false)
+
+	newMembers := make([]models.WorkspaceMemberRole, 0)
+	for _, member := range workspace.Members {
+		if member.UserId == request.UserId {
+			member.RoleId = request.RoleId
+		}
+
+		newMembers = append(newMembers, member)
 	}
 
-	err = services.SendMail(mailRequest)
+	workspace.Members = newMembers
+
+	_, err = services.UpdateWorkspace(workspace.Id, workspace)
 	if err != nil {
-		log.Println("Error sending email:", err)
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
 	}
-
-	_, err = services.CreateMemberInvitation(models.MemberInvitation{
-		WorkspaceId: workspace.Id,
-		InviterId:   profile.Id,
-		Email:       request.Email,
-		ExpiresAt:   time.Now().Add(time.Hour * 24),
-		Status:      models.PendingMemberInvitation,
-	})
 
 	c.JSON(http.StatusOK, models.Response{Data: "Success"})
 }

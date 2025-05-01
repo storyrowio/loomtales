@@ -1,8 +1,8 @@
 import Api from "@/lib/api.jsx";
 
 const memberEndpoint = "/member"
-const GetMembers = (query) => {
-    return Api.Instance.get(memberEndpoint, {params: query})
+const GetMembers = (workspaceId) => {
+    return Api.Instance.get(`${memberEndpoint}/${workspaceId}`)
         .then(res => res.data?.data);
 };
 const CreateMembers = (params) => {
@@ -22,12 +22,24 @@ const DeleteMember = (id) => {
         .then(res => res.data?.data);
 };
 
-const FrontService = {
+const InviteMembers = (params) => {
+    return Api.Instance.post(`${memberEndpoint}/invite`, params)
+        .then(res => res.data);
+};
+
+const UpdateMemberRole = (params) => {
+    return Api.Instance.post(`${memberEndpoint}/role`, params)
+        .then(res => res.data);
+};
+
+const MemberService = {
     GetMembers,
     CreateMembers,
     GetMember,
     UpdateMember,
-    DeleteMember
+    DeleteMember,
+    InviteMembers,
+    UpdateMemberRole
 };
 
-export default FrontService;
+export default MemberService;

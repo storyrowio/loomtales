@@ -9,11 +9,12 @@ import FrontSidebarMenuCreatePage from "@/pages/app/front/FrontSidebarMenuCreate
 import SystemSettingPage from "@/pages/app/system/setting/SystemSettingPage.jsx";
 import SystemSettingCreatePage from "@/pages/app/system/setting/SystemSettingCreatePage.jsx";
 import SystemSettingUpdatePage from "@/pages/app/system/setting/SystemSettingUpdatePage.jsx";
-import {FRONT_SIDEBAR_MENU_PATH, ROLE_PATH} from "@/constants/paths.jsx";
+import {FRONT_SIDEBAR_MENU_PATH, MEMBER_PATH, ROLE_PATH} from "@/constants/paths.jsx";
 import RolePage from "@/pages/app/system/role/RolePage.jsx";
 import RoleCreatePage from "@/pages/app/system/role/RoleCreatePage.jsx";
 import FrontSidebarMenuUpdatePage from "@/pages/app/front/FrontSidebarMenuUpdatePage.jsx";
 import RoleUpdatePage from "@/pages/app/system/role/RoleUpdatePage.jsx";
+import MemberPage from "@/pages/app/member/MemberPage.jsx";
 
 const routes = createBrowserRouter([
     {
@@ -35,6 +36,7 @@ const routes = createBrowserRouter([
             { path: '/app/front/sidebar-menu', Component: FrontSidebarMenuPage },
             { path: '/app/front/sidebar-menu/create', Component: FrontSidebarMenuCreatePage },
             { path: `${FRONT_SIDEBAR_MENU_PATH}/update/:id`, Component: FrontSidebarMenuUpdatePage },
+            { path: MEMBER_PATH, Component: MemberPage },
             { path: ROLE_PATH, Component: RolePage },
             { path: `${ROLE_PATH}/create`, Component: RoleCreatePage },
             { path: `${ROLE_PATH}/update/:id`, Component: RoleUpdatePage },

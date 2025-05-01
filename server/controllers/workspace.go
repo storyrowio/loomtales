@@ -12,7 +12,6 @@ import (
 
 func GetWorkspaces(c *gin.Context) {
 	var query models.Query
-
 	err := c.ShouldBindQuery(&query)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
