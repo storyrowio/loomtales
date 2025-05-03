@@ -58,11 +58,30 @@ func SignUp(c *gin.Context) {
 			},
 		}
 
+		// If already has workspace
+		if request.WorkspaceId != "" {
+			workspace := services.GetWorkspace(bson.M{"id": request.WorkspaceId}, nil, false)
+			if workspace != nil {
+				invitation := services.GetMemberInvitation(bson.M{"workspaceId": workspace.Id, "email": user.Email}, nil, false)
+				if invitation != nil && invitation.Status == models.SuccessMemberInvitation {
+					user.RoleId = invitation.RoleId
+
+					// Update workspace members
+					workspace.MemberRoleIds = append(workspace.MemberRoleIds, models.WorkspaceMemberRoleId{
+						UserId: user.Id,
+						RoleId: invitation.RoleId,
+					})
+					services.UpdateWorkspace(workspace.Id, workspace)
+				}
+			}
+		}
+
 		_, err = services.CreateUser(*user)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 			return
 		}
+
 	}
 
 	token, err := lib.GenerateToken(request.Email)
@@ -281,11 +300,55 @@ func UpdatePassword(c *gin.Context) {
 }
 
 func GetProfile(c *gin.Context) {
-	result := services.GetCurrentUser(c.Request)
+	query := struct {
+		Workspace string `form:"workspace"`
+		Action    string `form:"action"`
+	}{}
+	err := c.ShouldBindQuery(&query)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
 
-	if result == nil {
+	user := services.GetCurrentUser(c.Request)
+	if user == nil {
 		c.JSON(http.StatusNotFound, models.Response{Data: "User Not Found"})
 		return
+	}
+
+	// Get Workspace
+	if query.Workspace != "" {
+		workspace := services.GetWorkspace(bson.M{"id": query.Workspace}, nil, true)
+		if workspace != nil {
+			for _, member := range workspace.Members {
+				if member.User.Id == user.Id {
+					user.Role = member.Role
+				}
+			}
+
+			if query.Action != "" {
+				if query.Action == models.InviteConfirmAction {
+					workspace.MemberRoleIds = append(workspace.MemberRoleIds, models.WorkspaceMemberRoleId{
+						UserId: user.Id,
+						RoleId: user.RoleId,
+					})
+				}
+			}
+		}
+	}
+
+	menus, err := services.GetUserFrontSidebarMenus(*user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	result := struct {
+		Profile models.User               `json:"profile"`
+		Menus   []models.FrontSidebarMenu `json:"menus"`
+	}{
+		Profile: *user,
+		Menus:   menus,
 	}
 
 	c.JSON(http.StatusOK, models.Response{Data: result})

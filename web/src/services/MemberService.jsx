@@ -32,6 +32,16 @@ const UpdateMemberRole = (params) => {
         .then(res => res.data);
 };
 
+const ConfirmMemberInvitation = (params) => {
+    return Api.Instance.post(`${memberEndpoint}/invite/confirm`, params)
+        .then(res => res.data);
+};
+
+const ResendMemberInvitation = (invitationId) => {
+    return Api.Instance.patch(`${memberEndpoint}/resend-invite/${invitationId}`)
+        .then(res => res.data);
+};
+
 const MemberService = {
     GetMembers,
     CreateMembers,
@@ -39,7 +49,9 @@ const MemberService = {
     UpdateMember,
     DeleteMember,
     InviteMembers,
-    UpdateMemberRole
+    ConfirmMemberInvitation,
+    UpdateMemberRole,
+    ResendMemberInvitation
 };
 
 export default MemberService;

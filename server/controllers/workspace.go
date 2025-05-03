@@ -45,7 +45,7 @@ func CreateWorkspace(c *gin.Context) {
 	request.CreatedAt = time.Now()
 	request.UpdatedAt = time.Now()
 
-	request.Members = append(request.Members, models.WorkspaceMemberRole{
+	request.MemberRoleIds = append(request.MemberRoleIds, models.WorkspaceMemberRoleId{
 		UserId: profile.Id,
 		RoleId: profile.RoleId,
 	})

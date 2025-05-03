@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+const (
+	InviteConfirmAction string = "invite-confirm"
+)
+
 type Query struct {
 	Keyword     string `form:"keyword"`
 	Sort        string `form:"sort"`

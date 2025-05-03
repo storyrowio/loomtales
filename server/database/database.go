@@ -2,7 +2,7 @@ package database
 
 import (
 	"context"
-	"errors"
+	"encoding/json"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -121,7 +121,10 @@ func InsertMany(collection string, objects []interface{}) (*mongo.InsertManyResu
 func UpdateOne(collection string, filters bson.M, object interface{}) (*mongo.UpdateResult, error) {
 	objectMap, ok := object.(map[string]interface{})
 	if !ok {
-		return nil, errors.New("Object is not a map")
+		a, _ := json.Marshal(object)
+		json.Unmarshal(a, &objectMap)
+
+		//return nil, errors.New("Object is not a map")
 	}
 
 	objectMap["updatedAt"] = time.Now()

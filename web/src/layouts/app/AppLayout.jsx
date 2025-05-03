@@ -3,7 +3,7 @@ import {AppSidebar} from "@/components/ui/sidebar/app-sidebar.jsx";
 import {useCallback, useEffect, useRef, useState} from "react";
 import AppNavbarProfile from "@/layouts/app/components/AppNavbarProfile.jsx";
 import AppNavbarNotification from "@/layouts/app/components/AppNavbarNotification.jsx";
-import {Outlet} from "react-router";
+import {Outlet, useSearchParams} from "react-router";
 import {Menubar} from "@/components/ui/menubar.jsx";
 import FrontService from "@/services/FrontService.jsx";
 import {useDispatch, useSelector} from "@/store/index.jsx";
@@ -12,40 +12,110 @@ import AuthService from "@/services/AuthService.jsx";
 import {ProfileActions} from "@/store/slices/ProfileSlice.jsx";
 import WorkspaceService from "@/services/WorkspaceService.jsx";
 import {AppActions} from "@/store/slices/AppSlice.jsx";
+import Loader from "@/assets/images/loader.svg";
 
 export default function AppLayout() {
     const dispatch = useDispatch();
+    const [searchParams] = useSearchParams();
     const { id } = useSelector(state => state.profile);
     const [isMiniSidebar, setIsMiniSidebar] = useState(false);
+    const [loading, setLoading] = useState([]);
 
-    const fetchInitial = async () => {
-        await AuthService.GetProfile().then(res => dispatch(ProfileActions.setProfile(res?.data)))
-        return FrontService.GetUserSidebarMenus()
-            .then(res => {
-                dispatch(ThemeActions.setSidebarMenus(res))
-            });
+    const workspaceId = searchParams.get("workspace");
+    const action = searchParams.get("action");
+
+    const fetchProfile = useCallback((query) => {
+        return AuthService.GetProfile(query).then(res => {
+            dispatch(ProfileActions.setProfile(res?.data));
+            return res;
+        })
+    }, [dispatch]);
+
+    const updateWorkspaceMembers = (workspace) => {
+        // workspace.members = [...workspace.members, {userId: id, roleId: }]
     };
 
-    const fetchWorkspace = useCallback(() => {
+    const fetchWorkspaces = useCallback(() => {
         return WorkspaceService.GetWorkspaces({user: id})
             .then(res => {
                 dispatch(AppActions.setWorkspaces(res?.data));
                 if (res?.data?.length > 0) {
                     dispatch(AppActions.setActiveWorkspace(res?.data[0]));
-                }
-            })
-    }, [dispatch, id]);
 
-    useEffect(() => {
-        fetchInitial();
-    }, []);
+                    if (searchParams.get('workspace')) {
+                        const workspace = res?.data?.find(e => e.id === searchParams.get('workspace'));
+                        if (workspace) {
+                            dispatch(AppActions.setActiveWorkspace(workspace));
+                        }
+                    }
+                }
+
+                return res;
+            })
+    }, [dispatch, id, searchParams]);
+
+    const fetchSidebarMenu = useCallback(() => {
+        return FrontService.GetUserSidebarMenus()
+            .then(res => {
+                dispatch(ThemeActions.setSidebarMenus(res))
+            });
+    }, [dispatch]);
+
+    const fetchInitial = useCallback(async () => {
+        const resWorkspace = await WorkspaceService.GetWorkspaces();
+
+        if (resWorkspace?.data?.length > 0) {
+            let activeWorkspace = resWorkspace?.data[0];
+            if (workspaceId) {
+                activeWorkspace = resWorkspace?.data?.find(e => e.id === workspaceId);
+            }
+
+            const resProfile = await AuthService.GetProfile({workspace: activeWorkspace?.id});
+
+            if (resProfile?.profile) {
+                dispatch(ProfileActions.setProfile(resProfile?.profile));
+            }
+
+            if (resProfile?.menus) {
+                dispatch(ThemeActions.setSidebarMenus(resProfile?.menus));
+            }
+        }
+
+        // return fetchWorkspaces().then(() => {
+        //
+        // });
+        // return fetchProfile().then(() => {
+        //     return fetchWorkspaces().then(() => {
+        //         return fetchSidebarMenu();
+        //     });
+        // });
+    }, [fetchProfile, fetchSidebarMenu, fetchWorkspaces]);
 
     const mounted = useRef(false);
     useEffect(() => {
-        if (id && !mounted.current) {
-            fetchWorkspace();
+        if (!id && !mounted.current) {
+            fetchInitial().then(() => {
+                mounted.current = true;
+            });
         }
-    }, [id, fetchWorkspace]);
+    }, [fetchInitial, id, searchParams]);
+
+    useEffect(() => {
+        if (action === "invite-confirm") {
+
+        }
+    }, [action]);
+
+    if (loading.length < 2) {
+        return (
+            <div className="w-screen h-screen flex justify-center items-center">
+                <img
+                    alt="loading"
+                    src={Loader}
+                    className="w-54 h-54"/>
+            </div>
+        )
+    }
 
     return (
         <SidebarProvider className="bg-neutral-400">

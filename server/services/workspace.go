@@ -12,16 +12,17 @@ import (
 
 const WorkspaceCollection = "workspaces"
 
-func GetWorkspaceMember(data []models.WorkspaceMemberRole) []models.WorkspaceMemberRole {
+func GetWorkspaceMember(data []models.WorkspaceMemberRoleId) []models.WorkspaceMemberRole {
 	members := make([]models.WorkspaceMemberRole, 0)
 
-	for _, member := range data {
-		user := GetUser(bson.M{"id": member.UserId}, options.FindOne().SetProjection(bson.D{{"password", 0}}))
+	for _, item := range data {
+		member := models.WorkspaceMemberRole{}
+		user := GetUser(bson.M{"id": item.UserId}, options.FindOne().SetProjection(bson.D{{"password", 0}}))
 		if user != nil {
 			member.User = *user
 		}
 
-		role := GetRole(bson.M{"id": member.RoleId}, nil, true)
+		role := GetRole(bson.M{"id": item.RoleId}, nil, false)
 		if role != nil {
 			member.Role = *role
 		}
@@ -82,7 +83,7 @@ func GetWorkspace(filter bson.M, opts *options.FindOneOptions, includeDetail boo
 	}
 
 	if includeDetail {
-		data.Members = GetWorkspaceMember(data.Members)
+		data.Members = GetWorkspaceMember(data.MemberRoleIds)
 	}
 
 	return &data

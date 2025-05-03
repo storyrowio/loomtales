@@ -40,13 +40,14 @@ type UserInfo struct {
 }
 
 type AuthRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Name     string `json:"name"`
-	IsSocial bool   `json:"isSocial"`
-	Social   string `json:"social"` // google, facebook, etc
-	SocialId string `json:"socialId"`
-	Image    string `json:"image"`
+	Email       string `json:"email"`
+	Password    string `json:"password"`
+	Name        string `json:"name"`
+	IsSocial    bool   `json:"isSocial"`
+	Social      string `json:"social"` // google, facebook, etc
+	SocialId    string `json:"socialId"`
+	Image       string `json:"image"`
+	WorkspaceId string `json:"workspaceId"`
 }
 
 type ForgotPasswordRequest struct {

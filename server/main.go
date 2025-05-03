@@ -60,6 +60,8 @@ func main() {
 		api.POST("/forgot-password", controllers.ForgotPassword)
 		api.PATCH("/update-password", controllers.UpdatePassword)
 
+		api.POST("/member/invite/confirm", controllers.ConfirmMemberInvitation)
+
 		protected := api.Group("/", config.AuthMiddleware())
 		{
 			front := protected.Group("/front")
@@ -72,6 +74,7 @@ func main() {
 			protected.POST("/resend/confirmation", controllers.ResendConfirmation)
 
 			protected.POST("/member/invite", controllers.InviteMember)
+			protected.PATCH("/member/resend-invite/:invitationId", controllers.ResendMemberInvitation)
 			protected.GET("/member/:workspaceId", controllers.GetMembers)
 			protected.PATCH("/member/role", controllers.UpdateMemberRole)
 

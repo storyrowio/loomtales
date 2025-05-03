@@ -15,6 +15,7 @@ import RoleCreatePage from "@/pages/app/system/role/RoleCreatePage.jsx";
 import FrontSidebarMenuUpdatePage from "@/pages/app/front/FrontSidebarMenuUpdatePage.jsx";
 import RoleUpdatePage from "@/pages/app/system/role/RoleUpdatePage.jsx";
 import MemberPage from "@/pages/app/member/MemberPage.jsx";
+import MemberInviteConfirmPage from "@/pages/member/MemberInviteConfirmPage.jsx";
 
 const routes = createBrowserRouter([
     {
@@ -22,7 +23,8 @@ const routes = createBrowserRouter([
         Component: AuthLayout,
         children: [
             { index: true, Component: LoginPage },
-            { path: '/register', Component: RegisterPage }
+            { path: '/register', Component: RegisterPage },
+            { path: '/member/invite/confirm/:token', Component: MemberInviteConfirmPage }
         ]
     },
     {

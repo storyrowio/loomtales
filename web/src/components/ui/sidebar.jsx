@@ -232,6 +232,7 @@ function SidebarTrigger({
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
       variant="ghost"
+      color="default"
       size="icon"
       className={cn("size-9", className)}
       onClick={(event) => {

@@ -4,24 +4,34 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"loomtales/lib"
 	"loomtales/models"
 	"loomtales/services"
 	"net/http"
-	"os"
 	"time"
 )
 
 func GetMembers(c *gin.Context) {
 	workspaceId := c.Param("workspaceId")
 
-	invitation := services.GetMemberInvitations(bson.M{"workspaceId": workspaceId}, nil)
+	invitation := services.GetMemberInvitations(bson.M{
+		"workspaceId": workspaceId,
+		"status":      bson.M{"$eq": models.PendingMemberInvitation},
+	}, nil)
 	workspace := services.GetWorkspace(bson.M{"id": workspaceId}, nil, true)
-	members := workspace.ConvertWorkspaceMemberResult(invitation)
 
-	c.JSON(http.StatusOK, models.Response{Data: members})
+	result := struct {
+		Invitations []models.MemberInvitation    `json:"invitations"`
+		Members     []models.WorkspaceMemberRole `json:"members"`
+	}{
+		Invitations: invitation,
+		Members:     workspace.Members,
+	}
+
+	c.JSON(http.StatusOK, models.Response{Data: result})
 }
 
 func InviteMember(c *gin.Context) {
@@ -43,44 +53,73 @@ func InviteMember(c *gin.Context) {
 		c.JSON(http.StatusNotFound, models.Response{Data: fmt.Sprintf("workspace %s does not exist", request.WorkspaceId)})
 	}
 
-	for _, email := range request.Emails {
-		token, err := lib.GenerateToken(email)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
-			return
-		}
-
-		invitationConfirmUrl := fmt.Sprintf("%s/invite-member-confirm/%s", os.Getenv("FRONTEND_URL"), token)
-		mailData := models.InvitationMail{
+	for _, item := range request.Members {
+		err = services.SendMemberInvitation(models.InvitationMail{
 			InviterName:   profile.Name,
 			WorkspaceName: workspace.Name,
-			Email:         email,
-			Link:          invitationConfirmUrl,
-			SupportEmail:  os.Getenv("SUPPORT_EMAIL"),
-		}
-		mailRequest := models.SendMailRequest{
-			To:           email,
-			Subject:      "You’ve been invited to join a workspace on Loomtales.",
-			Data:         mailData,
-			TemplatePath: "templates/invitation-member.html",
-		}
-
-		err = services.SendMail(mailRequest)
-		if err != nil {
-			log.Println("Error sending email:", err)
-			c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
-		}
+			Email:         item.Email,
+		})
 
 		_, err = services.CreateMemberInvitation(models.MemberInvitation{
-			WorkspaceId: workspace.Id,
-			InviterId:   profile.Id,
-			Email:       email,
-			ExpiresAt:   time.Now().Add(time.Hour * 24),
-			Status:      models.PendingMemberInvitation,
+			Id:            uuid.New().String(),
+			WorkspaceId:   workspace.Id,
+			WorkspaceName: workspace.Name,
+			InviterId:     profile.Id,
+			InviterName:   profile.Name,
+			Email:         item.Email,
+			RoleId:        item.RoleId,
+			ExpiresAt:     time.Now().Add(time.Hour * 24),
+			Status:        models.PendingMemberInvitation,
+			BasicDate: models.BasicDate{
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			},
 		})
 	}
 
 	c.JSON(http.StatusOK, models.Response{Data: "Success"})
+}
+
+func ConfirmMemberInvitation(c *gin.Context) {
+	request := struct {
+		Token string `json:"token"`
+	}{}
+	err := c.ShouldBindJSON(&request)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	email, err := lib.VerifyToken(request.Token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	invitation := services.GetMemberInvitation(bson.M{"email": email}, nil, false)
+	if invitation == nil {
+		c.JSON(http.StatusNotFound, models.Response{Data: fmt.Sprintf("invitation %s does not exist", email)})
+		return
+	}
+
+	invitation.Status = models.SuccessMemberInvitation
+	_, err = services.UpdateMemberInvitation(invitation.Id, invitation)
+	if err != nil {
+		log.Println("Error updating member invitation: ", err)
+	}
+
+	result := struct {
+		CallbackUrl string `json:"callbackUrl"`
+	}{}
+
+	user := services.GetUser(bson.M{"email": email}, nil)
+	if user == nil {
+		result.CallbackUrl = fmt.Sprintf("/register?email=%s&workspace=%s", email, invitation.WorkspaceId)
+	} else {
+		result.CallbackUrl = fmt.Sprintf("/app?workspace=%s&action=invite-confirm", invitation.WorkspaceId)
+	}
+
+	c.JSON(http.StatusOK, models.Response{Data: result})
 }
 
 func UpdateMemberRole(c *gin.Context) {
@@ -98,8 +137,8 @@ func UpdateMemberRole(c *gin.Context) {
 
 	workspace := services.GetWorkspace(bson.M{"id": request.WorkspaceId}, nil, false)
 
-	newMembers := make([]models.WorkspaceMemberRole, 0)
-	for _, member := range workspace.Members {
+	newMembers := make([]models.WorkspaceMemberRoleId, 0)
+	for _, member := range workspace.MemberRoleIds {
 		if member.UserId == request.UserId {
 			member.RoleId = request.RoleId
 		}
@@ -107,9 +146,41 @@ func UpdateMemberRole(c *gin.Context) {
 		newMembers = append(newMembers, member)
 	}
 
-	workspace.Members = newMembers
+	workspace.MemberRoleIds = newMembers
 
 	_, err = services.UpdateWorkspace(workspace.Id, workspace)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, models.Response{Data: "Success"})
+}
+
+func ResendMemberInvitation(c *gin.Context) {
+	invitationId := c.Param("invitationId")
+
+	invitation := services.GetMemberInvitation(bson.M{"id": invitationId}, nil, false)
+	if invitation == nil {
+		c.JSON(http.StatusNotFound, models.Response{Data: fmt.Sprintf("invitation %s does not exist", invitationId)})
+		return
+	}
+
+	invitation.ExpiresAt = time.Now().Add(time.Hour * 24)
+
+	_, err := services.UpdateMemberInvitation(invitation.Id, invitation)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
+		return
+	}
+
+	params := models.InvitationMail{
+		InviterName:   invitation.InviterName,
+		WorkspaceName: invitation.WorkspaceName,
+		Email:         invitation.Email,
+	}
+
+	err = services.SendMemberInvitation(params)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.Response{Data: err.Error()})
 		return

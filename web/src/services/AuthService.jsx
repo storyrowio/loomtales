@@ -18,9 +18,9 @@ const Register = (params) => {
         });
 };
 
-const GetProfile = () => {
-    return Api.Instance.get('/profile')
-        .then(res => res?.data);
+const GetProfile = (query) => {
+    return Api.Instance.get('/profile', {params: query})
+        .then(res => res?.data?.data);
 };
 
 const AuthService = {

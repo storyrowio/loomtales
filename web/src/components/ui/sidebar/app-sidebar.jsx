@@ -21,6 +21,8 @@ import {NavMain} from "@/components/ui/sidebar/nav-main.jsx";
 import Logo from "@/assets/images/logos/logo.svg";
 import LogoIcon from "@/assets/images/logos/logo-icon.svg";
 import {useSelector} from "@/store/index.jsx";
+import WorkspaceSwitcher from "@/components/ui/sidebar/workspace-switcher.jsx";
+import {RoleTypes} from "@/constants/constants.jsx";
 
 const data = {
     user: {
@@ -158,23 +160,28 @@ const data = {
 export function AppSidebar(props) {
     const { miniSidebar } = props;
     const { sidebarMenus } = useSelector(state => state.theme);
+    const { role } = useSelector(state => state.profile);
+    const { workspaces, activeWorkspace } = useSelector(state => state.app);
 
     return (
         <Sidebar collapsible="icon" className="bg-white" {...props}>
             <SidebarHeader>
-                <div className={miniSidebar ? `py-1` : `py-4.5 px-4`}>
-                    <img
-                        alt="logo"
-                        src={miniSidebar ? LogoIcon : Logo}
-                        style={{
-                            width: miniSidebar ? 20 : 140,
-                            margin: miniSidebar ? 'auto' : 0,
-                        }}/>
-                </div>
-                {/*<TeamSwitcher teams={data.teams} />*/}
+                {role?.roleType === RoleTypes.systemAdmin.value ? (
+                    <div className={miniSidebar ? `py-1` : `py-4.5 px-4`}>
+                        <img
+                            alt="logo"
+                            src={miniSidebar ? LogoIcon : Logo}
+                            style={{
+                                width: miniSidebar ? 20 : 140,
+                                margin: miniSidebar ? 'auto' : 0,
+                            }}/>
+                    </div>
+                ) : (
+                    <WorkspaceSwitcher items={workspaces} active={activeWorkspace}/>
+                )}
             </SidebarHeader>
             <SidebarContent className={miniSidebar ? 'px-0' : 'px-4'}>
-                <NavMain items={sidebarMenus} miniSidebar={miniSidebar} />
+                <NavMain items={sidebarMenus} miniSidebar={miniSidebar}/>
             </SidebarContent>
             <SidebarFooter>
                 {/*<NavUser user={data.user} />*/}

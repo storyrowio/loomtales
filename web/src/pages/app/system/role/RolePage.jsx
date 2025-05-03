@@ -38,11 +38,11 @@ export default function RolePage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {resData?.data?.data?.length === 0 ? (
+                        {resData?.length === 0 ? (
                             <TableRow>
                                 <TableCell>No Data</TableCell>
                             </TableRow>
-                        ) : resData?.data?.data?.map((e, i) => (
+                        ) : resData?.map((e, i) => (
                             <TableRow key={i}>
                                 <TableCell>{e.name}</TableCell>
                                 <TableCell>{e.code}</TableCell>

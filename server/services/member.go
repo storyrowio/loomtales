@@ -3,11 +3,15 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"loomtales/database"
+	"loomtales/lib"
 	"loomtales/models"
+	"os"
+	"time"
 )
 
 const MemberInvitationCollection = "memberinvitations"
@@ -43,6 +47,9 @@ func GetMemberInvitationsWithPagination(filters bson.M, opt *options.FindOptions
 }
 
 func CreateMemberInvitation(params models.MemberInvitation) (bool, error) {
+	params.CreatedAt = time.Now()
+	params.UpdatedAt = time.Now()
+
 	_, err := database.InsertOne(MemberInvitationCollection, params)
 	if err != nil {
 		return false, err
@@ -86,4 +93,28 @@ func DeleteMemberInvitation(id string) (*mongo.DeleteResult, error) {
 	}
 
 	return res, nil
+}
+
+func SendMemberInvitation(params models.InvitationMail) error {
+	token, err := lib.GenerateToken(params.Email)
+	if err != nil {
+		return err
+	}
+
+	invitationConfirmUrl := fmt.Sprintf("%s/member/invite/confirm/%s", os.Getenv("FRONTEND_URL"), *token)
+	params.Link = invitationConfirmUrl
+	params.SupportEmail = os.Getenv("SUPPORT_EMAIL")
+	mailRequest := models.SendMailRequest{
+		To:           params.Email,
+		Subject:      "You’ve been invited to join a workspace on Loomtales.",
+		Data:         params,
+		TemplatePath: "templates/invitation-member.html",
+	}
+
+	err = SendMail(mailRequest)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
