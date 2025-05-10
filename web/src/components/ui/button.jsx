@@ -25,7 +25,7 @@ const buttonVariants = cva(
         iconRounded: "size-9 rounded-full"
       },
       color: {
-        default: "bg-background text-secondary-foreground hover:text-accent-foreground",
+        default: "bg-gray-200 text-secondary-foreground hover:text-accent-foreground",
         primary: "bg-primary text-primary-foreground hover:bg-primary/90",
         secondary: "bg-secondary text-primary-foreground hover:bg-secondary-600",
         destructive: "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",

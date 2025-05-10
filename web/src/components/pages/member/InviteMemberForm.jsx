@@ -10,7 +10,6 @@ import {
     DialogTrigger
 } from "@/components/ui/dialog.jsx";
 import {Button} from "@/components/ui/button.jsx";
-import {Label} from "@/components/ui/label.jsx";
 import {PlusIcon} from "lucide-react";
 import MemberService from "@/services/MemberService.jsx";
 import {useState} from "react";

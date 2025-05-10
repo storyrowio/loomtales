@@ -19,4 +19,11 @@ type Setting struct {
 	Type        string                 `json:"type"` // general, payment, etc
 	Status      bool                   `json:"status"`
 	IsDefault   bool                   `json:"isDefault" bson:"isDefault"`
+	BasicDate   `bson:",inline"`
+}
+
+type SettingQuery struct {
+	Type   string `form:"type"`
+	Code   string `form:"code"`
+	Status string `form:"status"`
 }

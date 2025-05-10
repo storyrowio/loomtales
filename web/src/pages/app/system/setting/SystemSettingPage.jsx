@@ -15,7 +15,6 @@ export default function SystemSettingPage() {
     const { data: resData } = useSWR(
         '/api/setting',
         () => SettingService.GetSettings({}));
-    console.log(resData?.data)
 
     const renderType = (type) => {
         return (

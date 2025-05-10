@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"loomtales/database"
+	"loomtales/lib"
 	"loomtales/models"
 )
 
@@ -118,6 +119,18 @@ func GetCloudinaryConfig() *models.CloudinaryInstanceSetting {
 	if res.CloudinaryCloudName == "" && res.CloudinarySecret == "" {
 		return nil
 	}
+
+	decryptedCloudName, _ := lib.Decrypt(res.CloudinaryCloudName)
+	res.CloudinaryCloudName = decryptedCloudName
+
+	decryptedSecret, _ := lib.Decrypt(res.CloudinarySecret)
+	res.CloudinarySecret = decryptedSecret
+
+	decryptedKey, _ := lib.Decrypt(res.CloudinaryKey)
+	res.CloudinaryKey = decryptedKey
+
+	decryptedBucketPath, _ := lib.Decrypt(res.CloudinaryBucketPath)
+	res.CloudinaryBucketPath = decryptedBucketPath
 
 	return &res
 }

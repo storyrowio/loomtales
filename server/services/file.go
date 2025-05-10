@@ -7,6 +7,7 @@ import (
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/oauth2"
 	"log"
@@ -51,8 +52,13 @@ func UploadToCloudinary(fileHeader *multipart.FileHeader, path string) (*models.
 	}
 	defer file.Close()
 
+	bucketName := "storyrow"
+	if config.CloudinaryBucketPath != "" {
+		bucketName = config.CloudinaryBucketPath
+	}
+
 	resp, err := cld.Upload.Upload(context.Background(), file, uploader.UploadParams{
-		Folder:   "golang-skeleton" + "/" + path,
+		Folder:   bucketName + "/" + path,
 		PublicID: fileHeader.Filename,
 	})
 	if err != nil {
@@ -181,6 +187,19 @@ func GetFiles(filters bson.M, opt *options.FindOptions, query *models.Query) mod
 	}
 
 	return result
+}
+
+func GetFile(filter bson.M, opts *options.FindOneOptions) *models.FileInfo {
+	var data models.FileInfo
+	err := database.FindOne(FileCollection, filter, opts).Decode(&data)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil
+		}
+		return nil
+	}
+
+	return &data
 }
 
 func CreateFiles(params []models.FileInfo) error {

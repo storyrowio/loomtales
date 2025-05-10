@@ -4,7 +4,7 @@ const (
 	SystemAdminRole = "systemadmin"
 	AdminRole       = "admin"
 	ManagerRole     = "manager"
-	MemberRole      = "member"
+	ContributorRole = "contributor"
 )
 
 type Role struct {
@@ -20,6 +20,7 @@ type Role struct {
 type Permission struct {
 	Id          string `json:"id"` // user:create, user:read
 	Name        string `json:"name"`
+	Feature     string `json:"feature"`
 	Description string `json:"description"`
 }
 

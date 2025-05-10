@@ -1,7 +1,7 @@
 import {useNavigate} from "react-router";
 import {useFormik} from "formik";
 import {ROLE_PATH} from "@/constants/paths.jsx";
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import useSWR from "swr";
 import RolePermissionService from "@/services/RolePermissionService.jsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.jsx";
@@ -13,6 +13,7 @@ import * as React from "react";
 import PageTitle from "@/components/shared/PageTitle.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 import {RoleTypes} from "@/constants/constants.jsx";
+import {Feature} from "@/constants/menus.jsx";
 
 export default function RoleForm(props) {
     const {data} = props;
@@ -35,6 +36,32 @@ export default function RoleForm(props) {
             formik.setValues(data);
         }
     }, [data?.id]);
+
+    const permissionData = useMemo(() => {
+        const data = {};
+
+        if (resPermissions?.length > 0) {
+            Object.keys(Feature).forEach(key => {
+                const permissions = resPermissions?.filter(e => e.feature === key);
+                if (permissions?.length > 0) {
+                    data[key] = {
+                        name: Feature[key].name,
+                        permissions: permissions
+                    }
+                }
+            });
+        }
+
+        return data;
+    }, [resPermissions]);
+
+    const handleChangeAllPermissions = (permissions) => {
+        if (permissions.every(e => formik.values.permissionIds.includes(e))) {
+            formik.setFieldValue('permissionIds', formik.values.permissionIds.filter(e => !permissions.includes(e)));
+        } else {
+            formik.setFieldValue('permissionIds', [...formik.values.permissionIds, ...permissions]);
+        }
+    };
 
     const handleChangePermission = (id) => {
         if (formik.values.permissionIds.includes(id)) {
@@ -114,20 +141,34 @@ export default function RoleForm(props) {
                         </div>
                         <div className="grid gap-1">
                             <Label htmlFor="title">Permissions</Label>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                                {resPermissions?.map((e, i) => (
-                                    <div key={i} className="py-3 items-top flex space-x-2">
-                                        <Checkbox
-                                            id={e.id}
-                                            checked={formik.values.permissionIds.includes(e.id)}
-                                            onCheckedChange={() => handleChangePermission(e.id)}/>
-                                        <div className="grid gap-1.5 leading-none">
-                                            <label
-                                                htmlFor={e.id}
-                                                className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                            >{e.name}</label>
-                                        </div>
-                                    </div>
+                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                {Object.keys(permissionData).map(key => (
+                                    <Card key={`feature-${key}`}>
+                                        <CardHeader className="flex items-center">
+                                            <Checkbox
+                                                checked={permissionData[key].permissions.every(e => formik.values.permissionIds.includes(e.id))}
+                                                onCheckedChange={() => handleChangeAllPermissions(permissionData[key].permissions?.map(e => e.id))}
+                                            />
+                                            <CardTitle>{permissionData[key]?.name}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            {permissionData[key]?.permissions.map((item, j) => (
+                                                <div key={`permission-${item.icon}-${j}`}
+                                                     className="py-3 items-top flex space-x-2">
+                                                    <Checkbox
+                                                        id={item.id}
+                                                        checked={formik.values.permissionIds.includes(item.id)}
+                                                        onCheckedChange={() => handleChangePermission(item.id)}/>
+                                                    <div className="grid gap-1.5 leading-none">
+                                                        <label
+                                                            htmlFor={item.id}
+                                                            className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                        >{item.name}</label>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </CardContent>
+                                    </Card>
                                 ))}
                             </div>
                         </div>

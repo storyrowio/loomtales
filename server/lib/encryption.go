@@ -9,12 +9,12 @@ import (
 	"io"
 )
 
-var key = "loomtales-WDH9AOh0zhOFfMGioSofwHRsVlRZdvasNTaI0YpTni75OsvRu251coVoM5dOc3sg"
+var key = "rufusJlykmzspZxuAQyWumrz02L0DaNm"
 
 func Encrypt(plainText string) (string, error) {
 	keyBytes := []byte(key)
-	if len(keyBytes) != 16 && len(keyBytes) != 24 && len(keyBytes) != 32 {
-		return "", errors.New("key length must be 16, 24, or 32 bytes")
+	if len(keyBytes) != 16 && len(keyBytes) != 24 && len(keyBytes) != 32 && len(keyBytes) != 64 {
+		return "", errors.New("key length must be 16, 24, 32 or 64 bytes")
 	}
 
 	block, err := aes.NewCipher(keyBytes)

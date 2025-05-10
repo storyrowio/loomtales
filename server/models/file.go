@@ -8,9 +8,11 @@ const (
 )
 
 type FileRequest struct {
-	MultiFile []*multipart.FileHeader `form:"files"`
-	Driver    string                  `form:"driver"`
-	Token     string                  `form:"token"`
+	WorkspaceId string                  `form:"workspaceId"`
+	MultiFile   []*multipart.FileHeader `form:"files"`
+	Driver      string                  `form:"driver"`
+	Token       string                  `form:"token"`
+	IsMedia     bool                    `form:"isMedia"`
 }
 
 type FileMetadata struct {
@@ -29,14 +31,15 @@ type UploadResult struct {
 }
 
 type FileInfo struct {
-	Id        string      `json:"id"`
-	UserId    string      `json:"userId"`
-	FileName  string      `json:"fileName"`
-	Path      string      `json:"path"`
-	Metadata  interface{} `json:"metadata"`
-	Url       string      `json:"url"`
-	Driver    string      `json:"driver" default:"cloudinary"`
-	BasicDate `bson:",inline"`
+	Id          string      `json:"id"`
+	UserId      string      `json:"userId"`
+	WorkspaceId string      `json:"workspaceId" bson:"workspaceId"`
+	FileName    string      `json:"fileName"`
+	Path        string      `json:"path"`
+	Metadata    interface{} `json:"metadata"`
+	Url         string      `json:"url"`
+	Driver      string      `json:"driver" default:"cloudinary"`
+	BasicDate   `bson:",inline"`
 }
 
 type DestroyFileRequest struct {
@@ -44,7 +47,8 @@ type DestroyFileRequest struct {
 }
 
 type CloudinaryInstanceSetting struct {
-	CloudinaryCloudName string `json:"cloudinaryCloudName" bson:"cloudinaryCloudName"`
-	CloudinaryKey       string `json:"cloudinaryKey" bson:"cloudinaryKey"`
-	CloudinarySecret    string `json:"cloudinarySecret" bson:"cloudinarySecret"`
+	CloudinaryCloudName  string `json:"cloudinaryCloudName" bson:"cloudinaryCloudName"`
+	CloudinaryKey        string `json:"cloudinaryKey" bson:"cloudinaryKey"`
+	CloudinarySecret     string `json:"cloudinarySecret" bson:"cloudinarySecret"`
+	CloudinaryBucketPath string `json:"cloudinaryBucketPath" bson:"cloudinaryBucketPath"`
 }

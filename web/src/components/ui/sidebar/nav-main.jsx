@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {cn} from "@/lib/utils.js";
 import {useLocation, useNavigate} from "react-router";
-import {AppMenuIcons, SidebarMenusOrder} from "@/constants/menus.jsx";
+import {Feature} from "@/constants/menus.jsx";
 import {useMemo} from "react";
 
 const ItemButtonContent = ({item, active, icon}) => {
@@ -50,9 +50,11 @@ export function NavMain({items, miniSidebar}) {
     const navigate = useNavigate();
 
     const orderedMenus = useMemo(() => {
+        const orderData = Object.keys(Feature).map(key => key);
+
         return [...items].sort((a, b) => {
-            const indexA = SidebarMenusOrder.indexOf(a.id);
-            const indexB = SidebarMenusOrder.indexOf(b.id);
+            const indexA = orderData.indexOf(a.id);
+            const indexB = orderData.indexOf(b.id);
             return (indexA === -1 ? Infinity : indexA) - (indexB === -1 ? Infinity : indexB);
         })
     }, [items]);
@@ -62,7 +64,7 @@ export function NavMain({items, miniSidebar}) {
             <SidebarMenu>
                 {orderedMenus?.map((item, i) => {
                     const active = pathname === `/app${item.path}`;
-                    const Icon = AppMenuIcons[item.icon] ?? ImageIcon;
+                    const Icon = Feature[item.id]?.icon ?? ImageIcon;
 
                     const buttonClassName = cn(
                         'h-10 cursor-pointer',

@@ -7,11 +7,14 @@ import {
 import AppStorage from "@/lib/storage.jsx";
 import {AUTH_TOKEN} from "@/constants/storage.jsx";
 import {useNavigate} from "react-router";
+import {useDispatch} from "@/store/index.jsx";
 
 export default function AppNavbarProfile() {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleLogout = async () => {
+
         await AppStorage.RemoveItem(AUTH_TOKEN);
         navigate('/');
     };

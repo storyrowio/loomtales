@@ -65,13 +65,18 @@ export default function AppLayout() {
         const resWorkspace = await WorkspaceService.GetWorkspaces();
 
         if (resWorkspace?.data?.length > 0) {
+            loading.push('workspace');
+            dispatch(AppActions.setWorkspaces(resWorkspace?.data));
+
             let activeWorkspace = resWorkspace?.data[0];
             if (workspaceId) {
                 activeWorkspace = resWorkspace?.data?.find(e => e.id === workspaceId);
             }
+            dispatch(AppActions.setActiveWorkspace(activeWorkspace));
 
             const resProfile = await AuthService.GetProfile({workspace: activeWorkspace?.id});
-
+            loading.push('profile')
+            loading.push('menus')
             if (resProfile?.profile) {
                 dispatch(ProfileActions.setProfile(resProfile?.profile));
             }
@@ -80,25 +85,16 @@ export default function AppLayout() {
                 dispatch(ThemeActions.setSidebarMenus(resProfile?.menus));
             }
         }
-
-        // return fetchWorkspaces().then(() => {
-        //
-        // });
-        // return fetchProfile().then(() => {
-        //     return fetchWorkspaces().then(() => {
-        //         return fetchSidebarMenu();
-        //     });
-        // });
     }, [fetchProfile, fetchSidebarMenu, fetchWorkspaces]);
 
     const mounted = useRef(false);
     useEffect(() => {
-        if (!id && !mounted.current) {
+        if (loading?.length === 0 && !mounted.current) {
             fetchInitial().then(() => {
                 mounted.current = true;
             });
         }
-    }, [fetchInitial, id, searchParams]);
+    }, [fetchInitial, id, loading?.length, searchParams]);
 
     useEffect(() => {
         if (action === "invite-confirm") {

@@ -20,7 +20,6 @@ const SettingForm = (props) => {
     const { formik } = props;
 
     const handleInputChange = (index, field, value) => {
-        console.log(index, field, value)
         const updatedSetting = [...formik.values.setting]
         updatedSetting[index][field] = value
         console.log(updatedSetting)
@@ -51,7 +50,7 @@ const SettingForm = (props) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {formik.values.setting.map((row, i) => (
+                    {formik.values.setting?.map((row, i) => (
                         <TableRow key={row.id}>
                             <TableCell>
                                 <Input
@@ -89,7 +88,7 @@ export default function SystemSettingForm(props) {
             type: '',
             status: false,
             setting: [
-                {key: 'MAIL_MAILER', value: 'smtp'}
+                {key: '', value: ''}
             ]
         },
         onSubmit: values => handleSubmit(values)
@@ -98,11 +97,15 @@ export default function SystemSettingForm(props) {
     useEffect(() => {
         if (data?.id) {
             formik.setValues(data);
-            formik.setFieldValue('setting', Object.keys(data?.setting).map(key => ({
-                id: Date.now(),
-                key: key,
-                value: data?.setting[key]
-            })));
+            if (Object.keys(data?.setting).map(key => key).length > 0) {
+                formik.setFieldValue('setting', Object.keys(data?.setting).map(key => ({
+                    id: Date.now(),
+                    key: key,
+                    value: data?.setting[key]
+                })));
+            } else {
+                formik.setFieldValue('setting', [{key: '', value: ''}])
+            }
         }
     }, [data?.id]);
 
@@ -121,7 +124,10 @@ export default function SystemSettingForm(props) {
         });
 
         return submit({...values, setting: setting})
-            .then(() => navigate(SYSTEM_SETTING_PATH))
+            .then(() => {
+                navigate(SYSTEM_SETTING_PATH);
+                formik.resetForm();
+            })
     };
 
     return (

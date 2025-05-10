@@ -18,24 +18,9 @@ type File struct {
 	MultiFile []*multipart.FileHeader `form:"file"`
 }
 
-type Media struct {
-	Id  string `json:"id"`
-	Url string `json:"url"`
-
-	CreatedAt time.Time `json:"createdAt"`
-	CreatedBy string    `json:"createdBy"`
-}
-
 type BasicDate struct {
 	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
 	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
-}
-
-type AuthResult struct {
-	Token string `json:"token"`
-	Id    string `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
 }
 
 type DefaultData struct {

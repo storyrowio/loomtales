@@ -73,6 +73,12 @@ func main() {
 			protected.PATCH("/profile", controllers.UpdateProfile)
 			protected.POST("/resend/confirmation", controllers.ResendConfirmation)
 
+			protected.GET("/media", controllers.GetMedias)
+			protected.POST("/media", controllers.CreateMedia)
+			protected.GET("/media/:id", controllers.GetMediaById)
+			protected.PATCH("/media/:id", controllers.UpdateMedia)
+			protected.DELETE("/media/:id", controllers.DeleteMedia)
+
 			protected.POST("/member/invite", controllers.InviteMember)
 			protected.PATCH("/member/resend-invite/:invitationId", controllers.ResendMemberInvitation)
 			protected.GET("/member/:workspaceId", controllers.GetMembers)
@@ -94,6 +100,8 @@ func main() {
 			protected.PATCH("/workspace/:id", controllers.UpdateWorkspace)
 			protected.DELETE("/workspace/:id", controllers.DeleteWorkspace)
 
+			protected.POST("/upload", controllers.UploadFile)
+
 			admin := protected.Group("/admin", config.AdminMiddleware())
 			{
 				adminFront := admin.Group("/front")
@@ -106,7 +114,9 @@ func main() {
 				}
 
 				admin.GET("/permission", controllers.GetPermissions)
-				admin.POST("/permission", controllers.CreatePermissions)
+				admin.POST("/permission", controllers.CreatePermission)
+				admin.PATCH("/permission", controllers.UpdatePermission)
+				admin.DELETE("/permission/:ids", controllers.DeletePermission)
 
 				admin.POST("/role", controllers.CreateRole)
 				admin.PATCH("/role/:id", controllers.UpdateRole)
